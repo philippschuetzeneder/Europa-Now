@@ -59,7 +59,7 @@ static func load_european_countries() -> Array[Dictionary]:
 		if iso == "-99" or iso.is_empty():
 			iso = str(properties.get("BRK_A3", "UNK"))
 
-		countries.append({
+		countries.append(CountryMetadata.enrich_country_data({
 			"id": iso,
 			"name": str(properties.get("ADMIN", properties.get("NAME", iso))),
 			"iso_a2": str(properties.get("ISO_A2", "")),
@@ -69,7 +69,7 @@ static func load_european_countries() -> Array[Dictionary]:
 			"economy": str(properties.get("ECONOMY", "")),
 			"color": _color_for_properties(properties),
 			"rings": rings,
-		})
+		}))
 
 	countries.sort_custom(func(a: Dictionary, b: Dictionary) -> bool:
 		return a["name"] < b["name"]

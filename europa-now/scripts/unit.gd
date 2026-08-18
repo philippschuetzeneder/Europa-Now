@@ -46,12 +46,31 @@ func setup(unit_data: UnitData) -> void:
 
 func set_selected(value: bool) -> void:
 	_is_selected = value
-	_selection_ring.visible = value
-	_fill.color = Color(0.95, 0.28, 0.22) if value else Color(0.82, 0.16, 0.16)
+	_selection_ring.visible = value and visible
+	_apply_fill_color()
 
 
-func place_on_country(country: Country) -> void:
-	global_position = country.get_placement_position()
+func set_moving(value: bool) -> void:
+	data.is_moving = value
+	visible = not value
+	if value:
+		_selection_ring.visible = false
+	else:
+		_apply_fill_color()
+
+
+func is_moving() -> bool:
+	return data.is_moving
+
+
+func place_on_province(province: Province) -> void:
+	global_position = province.get_placement_position()
+
+
+func _apply_fill_color() -> void:
+	if not is_instance_valid(_fill):
+		return
+	_fill.color = Color(0.95, 0.28, 0.22) if _is_selected else Color(0.82, 0.16, 0.16)
 
 
 func _create_circle_polygon(radius: float, color: Color) -> Polygon2D:

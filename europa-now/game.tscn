@@ -1,10 +1,14 @@
-[gd_scene load_steps=8 format=3 uid="uid://b2tetvget8rx"]
+[gd_scene load_steps=13 format=3 uid="uid://b2tetvget8rx"]
 
 [ext_resource type="Script" path="res://scripts/game.gd" id="1_game"]
 [ext_resource type="Script" path="res://scripts/europe_map.gd" id="2_map"]
 [ext_resource type="Script" path="res://scripts/map_camera.gd" id="3_camera"]
 [ext_resource type="Script" path="res://scripts/country_info_panel.gd" id="4_info"]
 [ext_resource type="Script" path="res://scripts/unit_manager.gd" id="5_units"]
+[ext_resource type="Script" path="res://scripts/time_controls.gd" id="6_time"]
+[ext_resource type="Script" path="res://scripts/debug_log.gd" id="7_debug"]
+[ext_resource type="Script" path="res://scripts/capitals_layer.gd" id="8_capitals"]
+[ext_resource type="Script" path="res://scripts/provinces_layer.gd" id="9_provinces"]
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_panel"]
 bg_color = Color(0.08, 0.1, 0.14, 0.88)
@@ -17,6 +21,28 @@ content_margin_top = 12.0
 content_margin_right = 14.0
 content_margin_bottom = 12.0
 
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_time"]
+bg_color = Color(0.08, 0.1, 0.14, 0.9)
+corner_radius_top_left = 8
+corner_radius_top_right = 8
+corner_radius_bottom_right = 8
+corner_radius_bottom_left = 8
+content_margin_left = 16.0
+content_margin_top = 10.0
+content_margin_right = 16.0
+content_margin_bottom = 10.0
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_debug"]
+bg_color = Color(0, 0, 0, 0.92)
+corner_radius_top_left = 6
+corner_radius_top_right = 6
+corner_radius_bottom_right = 6
+corner_radius_bottom_left = 6
+content_margin_left = 12.0
+content_margin_top = 10.0
+content_margin_right = 12.0
+content_margin_bottom = 10.0
+
 [node name="Game" type="Node2D"]
 script = ExtResource("1_game")
 
@@ -24,6 +50,12 @@ script = ExtResource("1_game")
 script = ExtResource("2_map")
 
 [node name="Countries" type="Node2D" parent="EuropeMap"]
+
+[node name="Provinces" type="Node2D" parent="EuropeMap"]
+script = ExtResource("9_provinces")
+
+[node name="Capitals" type="Node2D" parent="EuropeMap"]
+script = ExtResource("8_capitals")
 
 [node name="Units" type="Node2D" parent="EuropeMap"]
 script = ExtResource("5_units")
@@ -55,10 +87,11 @@ theme_override_constants/separation = 6
 layout_mode = 2
 theme_override_constants/separation = 8
 
-[node name="FlagLabel" type="Label" parent="UI/LeftPanel/InfoPanel/VBoxContainer/Header"]
+[node name="FlagRect" type="TextureRect" parent="UI/LeftPanel/InfoPanel/VBoxContainer/Header"]
+custom_minimum_size = Vector2(40, 28)
 layout_mode = 2
-theme_override_font_sizes/font_size = 24
-text = "🇩🇪"
+expand_mode = 1
+stretch_mode = 5
 
 [node name="CountryNameLabel" type="Label" parent="UI/LeftPanel/InfoPanel/VBoxContainer/Header"]
 layout_mode = 2
@@ -67,11 +100,23 @@ theme_override_colors/font_color = Color(0.92, 0.95, 1, 1)
 theme_override_font_sizes/font_size = 18
 text = "Kein Land ausgewaehlt"
 
-[node name="IsoLabel" type="Label" parent="UI/LeftPanel/InfoPanel/VBoxContainer"]
+[node name="ProvinceLabel" type="Label" parent="UI/LeftPanel/InfoPanel/VBoxContainer"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.82, 0.88, 0.98, 1)
+theme_override_font_sizes/font_size = 15
+text = "Provinz: -"
+
+[node name="HeadOfStateLabel" type="Label" parent="UI/LeftPanel/InfoPanel/VBoxContainer"]
 layout_mode = 2
 theme_override_colors/font_color = Color(0.76, 0.82, 0.92, 1)
 theme_override_font_sizes/font_size = 14
-text = "ISO: -"
+text = "Staatsoberhaupt: -"
+
+[node name="GovernmentLabel" type="Label" parent="UI/LeftPanel/InfoPanel/VBoxContainer"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.76, 0.82, 0.92, 1)
+theme_override_font_sizes/font_size = 14
+text = "Regierung: -"
 
 [node name="PopulationLabel" type="Label" parent="UI/LeftPanel/InfoPanel/VBoxContainer"]
 layout_mode = 2
@@ -97,15 +142,76 @@ theme_override_colors/font_color = Color(0.68, 0.74, 0.84, 1)
 theme_override_font_sizes/font_size = 13
 text = "Wirtschaft: -"
 
-[node name="HintLabel" type="Label" parent="UI"]
-anchors_preset = 2
+[node name="TopBar" type="CenterContainer" parent="UI"]
+anchors_preset = 10
+anchor_right = 1.0
+offset_top = 16.0
+offset_bottom = 72.0
+grow_horizontal = 2
+
+[node name="TimeControls" type="PanelContainer" parent="UI/TopBar"]
+layout_mode = 2
+theme_override_styles/panel = SubResource("StyleBoxFlat_time")
+script = ExtResource("6_time")
+
+[node name="HBoxContainer" type="HBoxContainer" parent="UI/TopBar/TimeControls"]
+layout_mode = 2
+theme_override_constants/separation = 16
+
+[node name="DateLabel" type="Label" parent="UI/TopBar/TimeControls/HBoxContainer"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.92, 0.95, 1, 1)
+theme_override_font_sizes/font_size = 18
+text = "01. Januar 2022"
+
+[node name="SpeedButtons" type="HBoxContainer" parent="UI/TopBar/TimeControls/HBoxContainer"]
+layout_mode = 2
+theme_override_constants/separation = 6
+
+[node name="PauseButton" type="Button" parent="UI/TopBar/TimeControls/HBoxContainer/SpeedButtons"]
+custom_minimum_size = Vector2(52, 0)
+layout_mode = 2
+text = "Pause"
+
+[node name="X1Button" type="Button" parent="UI/TopBar/TimeControls/HBoxContainer/SpeedButtons"]
+custom_minimum_size = Vector2(40, 0)
+layout_mode = 2
+text = "1x"
+
+[node name="X2Button" type="Button" parent="UI/TopBar/TimeControls/HBoxContainer/SpeedButtons"]
+custom_minimum_size = Vector2(40, 0)
+layout_mode = 2
+text = "2x"
+
+[node name="X5Button" type="Button" parent="UI/TopBar/TimeControls/HBoxContainer/SpeedButtons"]
+custom_minimum_size = Vector2(40, 0)
+layout_mode = 2
+text = "5x"
+
+[node name="DebugPanel" type="PanelContainer" parent="UI"]
+anchors_preset = 3
+anchor_left = 0.0
 anchor_top = 1.0
+anchor_right = 0.0
 anchor_bottom = 1.0
 offset_left = 16.0
-offset_top = -36.0
-offset_right = 900.0
-offset_bottom = -12.0
+offset_top = -220.0
+offset_right = 520.0
+offset_bottom = -16.0
 grow_vertical = 0
-theme_override_colors/font_color = Color(0.72, 0.78, 0.88, 0.9)
-theme_override_font_sizes/font_size = 13
-text = "Steuerung"
+theme_override_styles/panel = SubResource("StyleBoxFlat_debug")
+script = ExtResource("7_debug")
+
+[node name="MarginContainer" type="MarginContainer" parent="UI/DebugPanel"]
+layout_mode = 2
+
+[node name="LogLabel" type="RichTextLabel" parent="UI/DebugPanel/MarginContainer"]
+custom_minimum_size = Vector2(480, 180)
+layout_mode = 2
+theme_override_colors/default_color = Color(0.92, 0.94, 0.98, 1)
+theme_override_font_sizes/normal_font_size = 13
+bbcode_enabled = false
+fit_content = true
+scroll_active = false
+autowrap_mode = 3
+text = "Debug"

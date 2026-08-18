@@ -1,8 +1,10 @@
 extends PanelContainer
 
-@onready var _flag_label: Label = $VBoxContainer/Header/FlagLabel
+@onready var _flag: TextureRect = $VBoxContainer/Header/FlagRect
 @onready var _country_name: Label = $VBoxContainer/Header/CountryNameLabel
-@onready var _iso_label: Label = $VBoxContainer/IsoLabel
+@onready var _province_label: Label = $VBoxContainer/ProvinceLabel
+@onready var _head_of_state_label: Label = $VBoxContainer/HeadOfStateLabel
+@onready var _government_label: Label = $VBoxContainer/GovernmentLabel
 @onready var _population_label: Label = $VBoxContainer/PopulationLabel
 @onready var _gdp_label: Label = $VBoxContainer/GdpLabel
 @onready var _continent_label: Label = $VBoxContainer/ContinentLabel
@@ -14,42 +16,37 @@ func _ready() -> void:
 
 
 func show_country(country: Country) -> void:
-	_flag_label.text = _iso_to_flag_emoji(country.iso_a2)
+	_flag.texture = FlagFactory.get_flag_texture(country)
 	_country_name.text = country.display_name
-	_iso_label.text = "ISO: %s / %s" % [country.country_id, country.iso_a2]
+	_head_of_state_label.text = "Staatsoberhaupt: %s" % country.head_of_state
+	_government_label.text = "Regierung: %s" % country.government_type
 	_population_label.text = "Bevoelkerung: %s" % _format_population(country.population)
 	_gdp_label.text = "BIP: %s" % _format_gdp(country.gdp_million)
 	_continent_label.text = "Kontinent: %s" % country.continent
 	_economy_label.text = "Wirtschaft: %s" % _clean_economy_label(country.economy)
+	_province_label.visible = false
 	_set_details_visible(true)
 
 
+func show_province(province: Province) -> void:
+	_province_label.text = "Provinz: %s" % province.display_name
+	_province_label.visible = true
+
+
 func show_empty() -> void:
-	_flag_label.text = ""
+	_flag.texture = FlagFactory.get_placeholder_texture()
 	_country_name.text = "Kein Land ausgewaehlt"
+	_province_label.visible = false
 	_set_details_visible(false)
 
 
 func _set_details_visible(visible: bool) -> void:
-	_iso_label.visible = visible
+	_head_of_state_label.visible = visible
+	_government_label.visible = visible
 	_population_label.visible = visible
 	_gdp_label.visible = visible
 	_continent_label.visible = visible
 	_economy_label.visible = visible
-
-
-func _iso_to_flag_emoji(iso_a2: String) -> String:
-	var code := iso_a2.to_upper()
-	if code.length() != 2:
-		return ""
-
-	var flag := ""
-	for i in 2:
-		var char_code := code.unicode_at(i)
-		if char_code < 65 or char_code > 90:
-			return ""
-		flag += String.chr(0x1F1E6 + char_code - 65)
-	return flag
 
 
 func _format_population(value: int) -> String:

@@ -3,8 +3,6 @@ extends Area2D
 
 const COLLISION_LAYER_COUNTRIES := 1
 
-signal selected(country: Country)
-
 var country_id: String
 var display_name: String
 var iso_a2: String
@@ -12,9 +10,13 @@ var population: int
 var gdp_million: int
 var continent: String
 var economy: String
+var capital_name: String
+var capital_position: Vector2
+var head_of_state: String
+var government_type: String
 
 var _base_color: Color
-var _polygon_nodes: Array[Polygon2D] = []
+var _rings: Array = []
 var _is_selected := false
 var _is_hovered := false
 
@@ -27,6 +29,10 @@ func setup(data: Dictionary) -> void:
 	gdp_million = data.get("gdp_million", 0)
 	continent = data.get("continent", "")
 	economy = data.get("economy", "")
+	capital_name = data.get("capital_name", "")
+	capital_position = data.get("capital_position", Vector2.ZERO)
+	head_of_state = data.get("head_of_state", "k. A.")
+	government_type = data.get("government_type", "k. A.")
 
 	var color: Color = data["color"]
 	_base_color = color
@@ -35,17 +41,19 @@ func setup(data: Dictionary) -> void:
 		if ring is not PackedVector2Array or ring.size() < 3:
 			continue
 
+		_rings.append(ring)
+
 		var fill := Polygon2D.new()
 		fill.polygon = ring
 		fill.color = color
+		fill.color.a = 0.15
 		add_child(fill)
-		_polygon_nodes.append(fill)
 
 		var border := Line2D.new()
 		border.points = ring
 		border.closed = true
-		border.default_color = Color(0.12, 0.14, 0.18, 1.0)
-		border.width = 1.25
+		border.default_color = Color(0.10, 0.12, 0.16, 0.95)
+		border.width = 2.0
 		border.antialiased = true
 		add_child(border)
 
@@ -59,40 +67,42 @@ func setup(data: Dictionary) -> void:
 
 
 func get_placement_position() -> Vector2:
-	var best_ring: PackedVector2Array = PackedVector2Array()
-	var best_size := 0
-
-	for polygon in _polygon_nodes:
-		if polygon.polygon.size() > best_size:
-			best_size = polygon.polygon.size()
-			best_ring = polygon.polygon
-
+	var best_ring := _largest_ring()
 	if best_ring.is_empty():
 		return global_position
-
 	return _polygon_centroid(best_ring)
+
+
+func get_border_segments() -> Array:
+	var segments: Array = []
+	for ring in _rings:
+		if ring is not PackedVector2Array:
+			continue
+		for i in ring.size():
+			segments.append([ring[i], ring[(i + 1) % ring.size()]])
+	return segments
+
+
+func _largest_ring() -> PackedVector2Array:
+	var best: PackedVector2Array = PackedVector2Array()
+	var best_size := 0
+	for ring in _rings:
+		if ring is PackedVector2Array and ring.size() > best_size:
+			best_size = ring.size()
+			best = ring
+	return best
 
 
 func set_selected(value: bool) -> void:
 	_is_selected = value
-	_apply_fill_color()
 
 
 func set_hovered(value: bool) -> void:
-	if _is_hovered == value:
-		return
 	_is_hovered = value
-	_apply_fill_color()
 
 
 func _apply_fill_color() -> void:
-	var color := _base_color
-	if _is_selected:
-		color = _base_color.lightened(0.28)
-	elif _is_hovered:
-		color = _base_color.lightened(0.16)
-	for polygon in _polygon_nodes:
-		polygon.color = color
+	pass
 
 
 func _polygon_centroid(points: PackedVector2Array) -> Vector2:
