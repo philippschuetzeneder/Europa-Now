@@ -1,0 +1,847 @@
+﻿{
+    "MDG":  {
+                "lon":  47.507,
+                "lat":  -18.879,
+                "capital":  "Antananarivo"
+            },
+    "KEN":  {
+                "lon":  36.821,
+                "lat":  -1.286,
+                "capital":  "Nairobi"
+            },
+    "SDS":  {
+                "lon":  31.582,
+                "lat":  4.859,
+                "capital":  "Juba"
+            },
+    "LSO":  {
+                "lon":  27.483,
+                "lat":  -29.316,
+                "capital":  "Maseru"
+            },
+    "GMB":  {
+                "lon":  -16.579,
+                "lat":  13.455,
+                "capital":  "Banjul"
+            },
+    "CZE":  {
+                "lon":  14.438,
+                "lat":  50.076,
+                "capital":  "Prag"
+            },
+    "MKD":  {
+                "lon":  21.426,
+                "lat":  41.998,
+                "capital":  "Skopje"
+            },
+    "PAN":  {
+                "lon":  -79.519,
+                "lat":  8.983,
+                "capital":  "Panama-Stadt"
+            },
+    "SDN":  {
+                "lon":  32.56,
+                "lat":  15.501,
+                "capital":  "Khartum"
+            },
+    "GUY":  {
+                "lon":  -58.155,
+                "lat":  6.801,
+                "capital":  "Georgetown"
+            },
+    "NGA":  {
+                "lon":  7.489,
+                "lat":  9.057,
+                "capital":  "Abuja"
+            },
+    "BEN":  {
+                "lon":  2.632,
+                "lat":  6.497,
+                "capital":  "Porto-Novo"
+            },
+    "PHL":  {
+                "lon":  120.984,
+                "lat":  14.599,
+                "capital":  "Manila"
+            },
+    "GNB":  {
+                "lon":  -15.584,
+                "lat":  11.864,
+                "capital":  "Bissau"
+            },
+    "AZE":  {
+                "lon":  49.867,
+                "lat":  40.409,
+                "capital":  "Baku"
+            },
+    "KAZ":  {
+                "lon":  71.43,
+                "lat":  51.161,
+                "capital":  "Astana"
+            },
+    "TTO":  {
+                "lon":  -61.518,
+                "lat":  10.659,
+                "capital":  "Port of Spain"
+            },
+    "USA":  {
+                "lon":  -77.036,
+                "lat":  38.897,
+                "capital":  "Washington D.C."
+            },
+    "NAM":  {
+                "lon":  17.084,
+                "lat":  -22.56,
+                "capital":  "Windhoek"
+            },
+    "ZMB":  {
+                "lon":  28.322,
+                "lat":  -15.387,
+                "capital":  "Lusaka"
+            },
+    "TWN":  {
+                "lon":  121.565,
+                "lat":  25.033,
+                "capital":  "Taipeh"
+            },
+    "BGR":  {
+                "lon":  23.322,
+                "lat":  42.698,
+                "capital":  "Sofia"
+            },
+    "BIH":  {
+                "lon":  18.413,
+                "lat":  43.856,
+                "capital":  "Sarajevo"
+            },
+    "MOZ":  {
+                "lon":  32.573,
+                "lat":  -25.969,
+                "capital":  "Maputo"
+            },
+    "PSX":  {
+                "lon":  35.203,
+                "lat":  31.903,
+                "capital":  "Ramallah"
+            },
+    "NIC":  {
+                "lon":  -86.236,
+                "lat":  12.115,
+                "capital":  "Managua"
+            },
+    "SAU":  {
+                "lon":  46.675,
+                "lat":  24.714,
+                "capital":  "Riad"
+            },
+    "MNG":  {
+                "lon":  106.917,
+                "lat":  47.918,
+                "capital":  "Ulaanbaatar"
+            },
+    "PRK":  {
+                "lon":  125.762,
+                "lat":  39.039,
+                "capital":  "Pjoengjang"
+            },
+    "TKM":  {
+                "lon":  58.383,
+                "lat":  37.96,
+                "capital":  "Aschgabat"
+            },
+    "ARE":  {
+                "lon":  54.377,
+                "lat":  24.453,
+                "capital":  "Abu Dhabi"
+            },
+    "ALB":  {
+                "lon":  19.819,
+                "lat":  41.328,
+                "capital":  "Tirana"
+            },
+    "VEN":  {
+                "lon":  -66.903,
+                "lat":  10.491,
+                "capital":  "Caracas"
+            },
+    "FRA":  {
+                "lon":  2.352,
+                "lat":  48.857,
+                "capital":  "Paris"
+            },
+    "JAM":  {
+                "lon":  -76.794,
+                "lat":  18.017,
+                "capital":  "Kingston"
+            },
+    "SOM":  {
+                "lon":  45.318,
+                "lat":  2.047,
+                "capital":  "Mogadischu"
+            },
+    "THA":  {
+                "lon":  100.501,
+                "lat":  13.756,
+                "capital":  "Bangkok"
+            },
+    "BLR":  {
+                "lon":  27.561,
+                "lat":  53.904,
+                "capital":  "Minsk"
+            },
+    "ISR":  {
+                "lon":  35.214,
+                "lat":  31.768,
+                "capital":  "Jerusalem"
+            },
+    "KOR":  {
+                "lon":  126.978,
+                "lat":  37.566,
+                "capital":  "Seoul"
+            },
+    "CYP":  {
+                "lon":  33.382,
+                "lat":  35.185,
+                "capital":  "Nikosia"
+            },
+    "KWT":  {
+                "lon":  47.978,
+                "lat":  29.376,
+                "capital":  "Kuwait-Stadt"
+            },
+    "TJK":  {
+                "lon":  68.787,
+                "lat":  38.559,
+                "capital":  "Duschanbe"
+            },
+    "HND":  {
+                "lon":  -87.206,
+                "lat":  14.072,
+                "capital":  "Tegucigalpa"
+            },
+    "COG":  {
+                "lon":  15.283,
+                "lat":  -4.264,
+                "capital":  "Brazzaville"
+            },
+    "EGY":  {
+                "lon":  31.236,
+                "lat":  30.044,
+                "capital":  "Kairo"
+            },
+    "CRI":  {
+                "lon":  -84.087,
+                "lat":  9.935,
+                "capital":  "San Jose"
+            },
+    "CHL":  {
+                "lon":  -70.669,
+                "lat":  -33.449,
+                "capital":  "Santiago"
+            },
+    "EST":  {
+                "lon":  24.753,
+                "lat":  59.437,
+                "capital":  "Tallinn"
+            },
+    "GBR":  {
+                "lon":  -0.128,
+                "lat":  51.507,
+                "capital":  "London"
+            },
+    "MYS":  {
+                "lon":  101.686,
+                "lat":  3.139,
+                "capital":  "Kuala Lumpur"
+            },
+    "BEL":  {
+                "lon":  4.352,
+                "lat":  50.85,
+                "capital":  "Bruessel"
+            },
+    "TZA":  {
+                "lon":  35.738,
+                "lat":  -6.163,
+                "capital":  "Dodoma"
+            },
+    "PNG":  {
+                "lon":  147.18,
+                "lat":  -9.444,
+                "capital":  "Port Moresby"
+            },
+    "CMR":  {
+                "lon":  11.502,
+                "lat":  3.848,
+                "capital":  "Yaounde"
+            },
+    "ETH":  {
+                "lon":  38.757,
+                "lat":  9.005,
+                "capital":  "Addis Abeba"
+            },
+    "MMR":  {
+                "lon":  96.129,
+                "lat":  19.763,
+                "capital":  "Naypyidaw"
+            },
+    "RWA":  {
+                "lon":  30.059,
+                "lat":  -1.944,
+                "capital":  "Kigali"
+            },
+    "UZB":  {
+                "lon":  69.241,
+                "lat":  41.299,
+                "capital":  "Taschkent"
+            },
+    "BRN":  {
+                "lon":  114.942,
+                "lat":  4.89,
+                "capital":  "Bandar Seri Begawan"
+            },
+    "IND":  {
+                "lon":  77.209,
+                "lat":  28.614,
+                "capital":  "Neu-Delhi"
+            },
+    "CIV":  {
+                "lon":  -5.277,
+                "lat":  6.827,
+                "capital":  "Yamoussoukro"
+            },
+    "BLZ":  {
+                "lon":  -88.767,
+                "lat":  17.251,
+                "capital":  "Belmopan"
+            },
+    "DEU":  {
+                "lon":  13.405,
+                "lat":  52.52,
+                "capital":  "Berlin"
+            },
+    "NOR":  {
+                "lon":  10.752,
+                "lat":  59.914,
+                "capital":  "Oslo"
+            },
+    "SVN":  {
+                "lon":  14.506,
+                "lat":  46.056,
+                "capital":  "Ljubljana"
+            },
+    "AFG":  {
+                "lon":  69.207,
+                "lat":  34.555,
+                "capital":  "Kabul"
+            },
+    "LUX":  {
+                "lon":  6.13,
+                "lat":  49.612,
+                "capital":  "Luxemburg"
+            },
+    "VUT":  {
+                "lon":  168.327,
+                "lat":  -17.733,
+                "capital":  "Port Vila"
+            },
+    "ECU":  {
+                "lon":  -78.468,
+                "lat":  -0.18,
+                "capital":  "Quito"
+            },
+    "LBY":  {
+                "lon":  13.191,
+                "lat":  32.887,
+                "capital":  "Tripolis"
+            },
+    "ISL":  {
+                "lon":  -21.943,
+                "lat":  64.147,
+                "capital":  "Reykjavik"
+            },
+    "OMN":  {
+                "lon":  58.593,
+                "lat":  23.588,
+                "capital":  "Masqat"
+            },
+    "GRC":  {
+                "lon":  23.728,
+                "lat":  37.984,
+                "capital":  "Athen"
+            },
+    "CUB":  {
+                "lon":  -82.367,
+                "lat":  23.114,
+                "capital":  "Havanna"
+            },
+    "VNM":  {
+                "lon":  105.834,
+                "lat":  21.028,
+                "capital":  "Hanoi"
+            },
+    "FIN":  {
+                "lon":  24.938,
+                "lat":  60.17,
+                "capital":  "Helsinki"
+            },
+    "MEX":  {
+                "lon":  -99.133,
+                "lat":  19.433,
+                "capital":  "Mexiko-Stadt"
+            },
+    "CAN":  {
+                "lon":  -75.697,
+                "lat":  45.421,
+                "capital":  "Ottawa"
+            },
+    "BTN":  {
+                "lon":  89.634,
+                "lat":  27.472,
+                "capital":  "Thimphu"
+            },
+    "GIN":  {
+                "lon":  -13.578,
+                "lat":  9.642,
+                "capital":  "Conakry"
+            },
+    "SLV":  {
+                "lon":  -89.187,
+                "lat":  13.692,
+                "capital":  "San Salvador"
+            },
+    "HUN":  {
+                "lon":  19.04,
+                "lat":  47.497,
+                "capital":  "Budapest"
+            },
+    "LVA":  {
+                "lon":  24.105,
+                "lat":  56.949,
+                "capital":  "Riga"
+            },
+    "URY":  {
+                "lon":  -56.164,
+                "lat":  -34.901,
+                "capital":  "Montevideo"
+            },
+    "TUN":  {
+                "lon":  10.181,
+                "lat":  36.806,
+                "capital":  "Tunis"
+            },
+    "TLS":  {
+                "lon":  125.574,
+                "lat":  -8.557,
+                "capital":  "Dili"
+            },
+    "ITA":  {
+                "lon":  12.496,
+                "lat":  41.903,
+                "capital":  "Rom"
+            },
+    "AGO":  {
+                "lon":  13.234,
+                "lat":  -8.839,
+                "capital":  "Luanda"
+            },
+    "ERI":  {
+                "lon":  38.931,
+                "lat":  15.339,
+                "capital":  "Asmara"
+            },
+    "AUS":  {
+                "lon":  149.13,
+                "lat":  -35.281,
+                "capital":  "Canberra"
+            },
+    "SYR":  {
+                "lon":  36.292,
+                "lat":  33.514,
+                "capital":  "Damaskus"
+            },
+    "SWZ":  {
+                "lon":  31.145,
+                "lat":  -26.305,
+                "capital":  "Mbabane"
+            },
+    "AUT":  {
+                "lon":  16.374,
+                "lat":  48.208,
+                "capital":  "Wien"
+            },
+    "DOM":  {
+                "lon":  -69.931,
+                "lat":  18.486,
+                "capital":  "Santo Domingo"
+            },
+    "IRL":  {
+                "lon":  -6.26,
+                "lat":  53.35,
+                "capital":  "Dublin"
+            },
+    "SRB":  {
+                "lon":  20.448,
+                "lat":  44.787,
+                "capital":  "Belgrad"
+            },
+    "CAF":  {
+                "lon":  18.558,
+                "lat":  4.394,
+                "capital":  "Bangui"
+            },
+    "ARG":  {
+                "lon":  -58.382,
+                "lat":  -34.603,
+                "capital":  "Buenos Aires"
+            },
+    "LKA":  {
+                "lon":  79.902,
+                "lat":  6.911,
+                "capital":  "Sri Jayawardenepura"
+            },
+    "YEM":  {
+                "lon":  44.207,
+                "lat":  15.369,
+                "capital":  "Sanaa"
+            },
+    "NER":  {
+                "lon":  2.11,
+                "lat":  13.513,
+                "capital":  "Niamey"
+            },
+    "POL":  {
+                "lon":  21.012,
+                "lat":  52.23,
+                "capital":  "Warschau"
+            },
+    "TGO":  {
+                "lon":  1.225,
+                "lat":  6.137,
+                "capital":  "Lome"
+            },
+    "PRY":  {
+                "lon":  -57.576,
+                "lat":  -25.264,
+                "capital":  "Asuncion"
+            },
+    "DZA":  {
+                "lon":  3.058,
+                "lat":  36.753,
+                "capital":  "Algier"
+            },
+    "SUR":  {
+                "lon":  -55.204,
+                "lat":  5.852,
+                "capital":  "Paramaribo"
+            },
+    "KOS":  {
+                "lon":  21.166,
+                "lat":  42.663,
+                "capital":  "Pristina"
+            },
+    "GTM":  {
+                "lon":  -90.513,
+                "lat":  14.634,
+                "capital":  "Guatemala-Stadt"
+            },
+    "RUS":  {
+                "lon":  37.617,
+                "lat":  55.756,
+                "capital":  "Moskau"
+            },
+    "TCD":  {
+                "lon":  15.044,
+                "lat":  12.135,
+                "capital":  "N\u0027Djamena"
+            },
+    "BGD":  {
+                "lon":  90.412,
+                "lat":  23.81,
+                "capital":  "Dhaka"
+            },
+    "NPL":  {
+                "lon":  85.324,
+                "lat":  27.717,
+                "capital":  "Kathmandu"
+            },
+    "BRA":  {
+                "lon":  -47.929,
+                "lat":  -15.794,
+                "capital":  "Brasilia"
+            },
+    "LAO":  {
+                "lon":  102.634,
+                "lat":  17.975,
+                "capital":  "Vientiane"
+            },
+    "TUR":  {
+                "lon":  32.86,
+                "lat":  39.933,
+                "capital":  "Ankara"
+            },
+    "LBN":  {
+                "lon":  35.501,
+                "lat":  33.894,
+                "capital":  "Beirut"
+            },
+    "SVK":  {
+                "lon":  17.108,
+                "lat":  48.148,
+                "capital":  "Bratislava"
+            },
+    "SEN":  {
+                "lon":  -17.467,
+                "lat":  14.693,
+                "capital":  "Dakar"
+            },
+    "LTU":  {
+                "lon":  25.28,
+                "lat":  54.687,
+                "capital":  "Vilnius"
+            },
+    "MRT":  {
+                "lon":  -15.978,
+                "lat":  18.074,
+                "capital":  "Nouakchott"
+            },
+    "GEO":  {
+                "lon":  44.793,
+                "lat":  41.716,
+                "capital":  "Tiflis"
+            },
+    "ESP":  {
+                "lon":  -3.704,
+                "lat":  40.417,
+                "capital":  "Madrid"
+            },
+    "PRT":  {
+                "lon":  -9.139,
+                "lat":  38.722,
+                "capital":  "Lissabon"
+            },
+    "SAH":  {
+                "lon":  -13.203,
+                "lat":  27.154,
+                "capital":  "El Aaiun"
+            },
+    "MLI":  {
+                "lon":  -8.003,
+                "lat":  12.64,
+                "capital":  "Bamako"
+            },
+    "HTI":  {
+                "lon":  -72.335,
+                "lat":  18.544,
+                "capital":  "Port-au-Prince"
+            },
+    "BOL":  {
+                "lon":  -65.259,
+                "lat":  -19.047,
+                "capital":  "Sucre"
+            },
+    "ZAF":  {
+                "lon":  28.188,
+                "lat":  -25.746,
+                "capital":  "Pretoria"
+            },
+    "DNK":  {
+                "lon":  12.568,
+                "lat":  55.676,
+                "capital":  "Kopenhagen"
+            },
+    "GNQ":  {
+                "lon":  8.782,
+                "lat":  3.752,
+                "capital":  "Malabo"
+            },
+    "SWE":  {
+                "lon":  18.068,
+                "lat":  59.329,
+                "capital":  "Stockholm"
+            },
+    "IRQ":  {
+                "lon":  44.366,
+                "lat":  33.315,
+                "capital":  "Bagdad"
+            },
+    "MAR":  {
+                "lon":  -6.849,
+                "lat":  34.021,
+                "capital":  "Rabat"
+            },
+    "SLE":  {
+                "lon":  -13.232,
+                "lat":  8.465,
+                "capital":  "Freetown"
+            },
+    "MNE":  {
+                "lon":  19.259,
+                "lat":  42.43,
+                "capital":  "Podgorica"
+            },
+    "NLD":  {
+                "lon":  4.904,
+                "lat":  52.367,
+                "capital":  "Amsterdam"
+            },
+    "ROU":  {
+                "lon":  26.102,
+                "lat":  44.426,
+                "capital":  "Bukarest"
+            },
+    "ZWE":  {
+                "lon":  31.053,
+                "lat":  -17.829,
+                "capital":  "Harare"
+            },
+    "SLB":  {
+                "lon":  159.95,
+                "lat":  -9.431,
+                "capital":  "Honiara"
+            },
+    "IRN":  {
+                "lon":  51.389,
+                "lat":  35.689,
+                "capital":  "Teheran"
+            },
+    "CHE":  {
+                "lon":  7.447,
+                "lat":  46.948,
+                "capital":  "Bern"
+            },
+    "GHA":  {
+                "lon":  -0.187,
+                "lat":  5.603,
+                "capital":  "Accra"
+            },
+    "KHM":  {
+                "lon":  104.916,
+                "lat":  11.556,
+                "capital":  "Phnom Penh"
+            },
+    "COD":  {
+                "lon":  15.322,
+                "lat":  -4.322,
+                "capital":  "Kinshasa"
+            },
+    "BDI":  {
+                "lon":  29.925,
+                "lat":  -3.427,
+                "capital":  "Gitega"
+            },
+    "GAB":  {
+                "lon":  9.467,
+                "lat":  0.416,
+                "capital":  "Libreville"
+            },
+    "BWA":  {
+                "lon":  25.92,
+                "lat":  -24.628,
+                "capital":  "Gaborone"
+            },
+    "NZL":  {
+                "lon":  174.776,
+                "lat":  -41.286,
+                "capital":  "Wellington"
+            },
+    "JPN":  {
+                "lon":  139.692,
+                "lat":  35.689,
+                "capital":  "Tokio"
+            },
+    "CHN":  {
+                "lon":  116.407,
+                "lat":  39.904,
+                "capital":  "Peking"
+            },
+    "BFA":  {
+                "lon":  -1.534,
+                "lat":  12.371,
+                "capital":  "Ouagadougou"
+            },
+    "MDA":  {
+                "lon":  28.863,
+                "lat":  47.01,
+                "capital":  "Chisinau"
+            },
+    "UKR":  {
+                "lon":  30.523,
+                "lat":  50.45,
+                "capital":  "Kiew"
+            },
+    "HRV":  {
+                "lon":  15.981,
+                "lat":  45.815,
+                "capital":  "Zagreb"
+            },
+    "ARM":  {
+                "lon":  44.513,
+                "lat":  40.179,
+                "capital":  "Jerewan"
+            },
+    "LBR":  {
+                "lon":  -10.797,
+                "lat":  6.291,
+                "capital":  "Monrovia"
+            },
+    "KGZ":  {
+                "lon":  74.57,
+                "lat":  42.874,
+                "capital":  "Bischkek"
+            },
+    "PER":  {
+                "lon":  -77.043,
+                "lat":  -12.046,
+                "capital":  "Lima"
+            },
+    "IDN":  {
+                "lon":  106.846,
+                "lat":  -6.208,
+                "capital":  "Jakarta"
+            },
+    "MWI":  {
+                "lon":  33.787,
+                "lat":  -13.962,
+                "capital":  "Lilongwe"
+            },
+    "COL":  {
+                "lon":  -74.072,
+                "lat":  4.711,
+                "capital":  "Bogota"
+            },
+    "PAK":  {
+                "lon":  73.047,
+                "lat":  33.684,
+                "capital":  "Islamabad"
+            },
+    "QAT":  {
+                "lon":  51.531,
+                "lat":  25.286,
+                "capital":  "Doha"
+            },
+    "UGA":  {
+                "lon":  32.583,
+                "lat":  0.347,
+                "capital":  "Kampala"
+            },
+    "DJI":  {
+                "lon":  43.146,
+                "lat":  11.573,
+                "capital":  "Dschibuti"
+            },
+    "BHS":  {
+                "lon":  -77.355,
+                "lat":  25.058,
+                "capital":  "Nassau"
+            },
+    "FJI":  {
+                "lon":  178.441,
+                "lat":  -18.141,
+                "capital":  "Suva"
+            },
+    "JOR":  {
+                "lon":  35.93,
+                "lat":  31.953,
+                "capital":  "Amman"
+            }
+}

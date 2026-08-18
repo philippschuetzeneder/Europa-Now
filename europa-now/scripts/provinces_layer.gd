@@ -9,10 +9,20 @@ var _provinces_by_country: Dictionary = {}  # country_id -> Array[Province]
 func build_from_countries(countries_data: Array[Dictionary]) -> Array[Province]:
 	_clear()
 
-	var reference_area := ProvinceGenerator.reference_area_from_countries(countries_data)
+	var reference_area: float = ProvinceGenerator.reference_area_from_countries(countries_data)
 	for country_data in countries_data:
-		var generated := ProvinceGenerator.generate_for_country(country_data, reference_area)
-		for province_data in generated:
+		var country_id: String = country_data["id"]
+		var province_data_list: Array[Dictionary] = []
+
+		if AdminDivisionLoader.can_load(country_id):
+			province_data_list = AdminDivisionLoader.load_provinces(country_data)
+
+		if province_data_list.is_empty():
+			province_data_list = ProvinceGenerator.generate_for_country(country_data, reference_area)
+		else:
+			province_data_list = ProvinceGenerator.ensure_full_country_coverage(province_data_list, country_data)
+
+		for province_data in province_data_list:
 			_add_province(province_data)
 
 	return _provinces
@@ -42,7 +52,7 @@ func find_province_near_position(country_id: String, position: Vector2) -> Provi
 	var best: Province = null
 	var best_distance := INF
 	for province in get_provinces_for_country(country_id):
-		var distance := province.center.distance_squared_to(position)
+		var distance: float = province.center.distance_squared_to(position)
 		if distance < best_distance:
 			best_distance = distance
 			best = province

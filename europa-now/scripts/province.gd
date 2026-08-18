@@ -7,6 +7,7 @@ var province_id: String
 var display_name: String
 var country_id: String
 var owner_country_id: String
+var controller_country_id: String
 var center: Vector2
 var primary_city: String
 
@@ -14,6 +15,7 @@ var _base_color: Color
 var _polygon_nodes: Array[Polygon2D] = []
 var _is_selected := false
 var _is_hovered := false
+var _is_contested := false
 
 
 func setup(data: Dictionary) -> void:
@@ -21,6 +23,7 @@ func setup(data: Dictionary) -> void:
 	display_name = data["name"]
 	country_id = data["country_id"]
 	owner_country_id = data.get("owner_country_id", country_id)
+	controller_country_id = data.get("controller_country_id", owner_country_id)
 	center = data.get("center", Vector2.ZERO)
 	primary_city = data.get("primary_city", "")
 
@@ -42,7 +45,7 @@ func setup(data: Dictionary) -> void:
 		border.closed = true
 		border.default_color = Color(0.08, 0.10, 0.14, 0.85)
 		border.width = 1.0
-		border.antialiased = true
+		border.antialiased = false
 		add_child(border)
 
 		var collision := CollisionPolygon2D.new()
@@ -81,11 +84,33 @@ func set_hovered(value: bool) -> void:
 	_apply_fill_color()
 
 
+func set_contested(value: bool) -> void:
+	if _is_contested == value:
+		return
+	_is_contested = value
+	_apply_fill_color()
+
+
+func set_controller(country_id: String) -> void:
+	controller_country_id = country_id
+
+
+func set_owner(country_id: String) -> void:
+	owner_country_id = country_id
+	controller_country_id = country_id
+
+
+func is_contested() -> bool:
+	return _is_contested
+
+
 func _apply_fill_color() -> void:
 	var color := _base_color
+	if _is_contested:
+		color = _base_color.lerp(Color(0.85, 0.2, 0.18, 1.0), 0.45)
 	if _is_selected:
-		color = _base_color.lightened(0.22)
+		color = color.lightened(0.22)
 	elif _is_hovered:
-		color = _base_color.lightened(0.12)
+		color = color.lightened(0.12)
 	for polygon in _polygon_nodes:
 		polygon.color = color

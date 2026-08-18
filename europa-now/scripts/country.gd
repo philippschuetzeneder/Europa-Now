@@ -8,12 +8,15 @@ var display_name: String
 var iso_a2: String
 var population: int
 var gdp_million: int
+var area_km2: float
 var continent: String
+var region: String
 var economy: String
 var capital_name: String
 var capital_position: Vector2
 var head_of_state: String
 var government_type: String
+var neighbor_country_ids: Array[String] = []
 
 var _base_color: Color
 var _rings: Array = []
@@ -27,7 +30,9 @@ func setup(data: Dictionary) -> void:
 	iso_a2 = data.get("iso_a2", "")
 	population = data.get("population", 0)
 	gdp_million = data.get("gdp_million", 0)
+	area_km2 = float(data.get("area_km2", 0.0))
 	continent = data.get("continent", "")
+	region = data.get("region", "")
 	economy = data.get("economy", "")
 	capital_name = data.get("capital_name", "")
 	capital_position = data.get("capital_position", Vector2.ZERO)
@@ -42,6 +47,12 @@ func setup(data: Dictionary) -> void:
 			continue
 
 		_rings.append(ring)
+
+		var base_fill := Polygon2D.new()
+		base_fill.polygon = ring
+		base_fill.color = color
+		base_fill.z_index = -2
+		add_child(base_fill)
 
 		var fill := Polygon2D.new()
 		fill.polygon = ring

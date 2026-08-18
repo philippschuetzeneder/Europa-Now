@@ -1,14 +1,14 @@
 class_name CapitalMarker
 extends Node2D
 
-const DOT_RADIUS := 4.0
-const MIN_DOT_ZOOM := 0.22
-const MIN_LABEL_ZOOM := 0.42
+const DOT_RADIUS := 2.8
+const DOT_TARGET_SCREEN_PX := 5.0
+const DOT_MAX_SCALE := 3.5
+const DOT_MIN_ZOOM := 0.52
 
 var capital_name: String
 
 var _dot: Polygon2D
-var _label: Label
 
 
 func setup(name: String, map_position: Vector2) -> void:
@@ -19,21 +19,21 @@ func setup(name: String, map_position: Vector2) -> void:
 	_dot = _create_dot()
 	add_child(_dot)
 
-	_label = Label.new()
-	_label.text = name
-	_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-	_label.position = Vector2(-48, 6)
-	_label.custom_minimum_size = Vector2(96, 0)
-	_label.add_theme_color_override("font_color", Color(0.98, 0.98, 1.0, 1.0))
-	_label.add_theme_color_override("font_outline_color", Color(0.05, 0.08, 0.12, 0.95))
-	_label.add_theme_constant_override("outline_size", 3)
-	_label.add_theme_font_size_override("font_size", 11)
-	add_child(_label)
 
+func update_zoom_scale(zoom_level: float) -> void:
+	var show_marker: bool = zoom_level >= DOT_MIN_ZOOM
+	visible = show_marker
+	if not show_marker:
+		return
 
-func update_zoom_visibility(zoom_level: float) -> void:
-	_dot.visible = zoom_level >= MIN_DOT_ZOOM
-	_label.visible = zoom_level >= MIN_LABEL_ZOOM
+	var target_px: float = DOT_TARGET_SCREEN_PX
+	if zoom_level < 0.7:
+		target_px = 4.0
+
+	var dot_scale: float = MapUiScale.screen_scale(
+		zoom_level, DOT_RADIUS, target_px, DOT_MAX_SCALE
+	)
+	scale = Vector2.ONE * dot_scale
 
 
 func _create_dot() -> Polygon2D:

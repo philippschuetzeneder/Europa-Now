@@ -1,42 +1,22 @@
 class_name ProvinceAdjacency
 extends RefCounted
 
-const GRID_STEP := 0.28
-const MIN_SHARED_BORDER_POINTS := 2
+const SEGMENT_STEP := 0.12
+const TOUCH_DISTANCE := 0.45
 
 var _neighbors: Dictionary = {}
+var _provinces_by_id: Dictionary = {}
 
 
 static func build(provinces: Array[Province]) -> ProvinceAdjacency:
 	var adjacency := ProvinceAdjacency.new()
-	var point_hits: Dictionary = {}
 
 	for province in provinces:
 		adjacency._neighbors[province.province_id] = []
+		adjacency._provinces_by_id[province.province_id] = province
 
-		for segment in province.get_border_segments():
-			for point in segment:
-				var key := _point_key(point, GRID_STEP)
-				if not point_hits.has(key):
-					point_hits[key] = []
-				var owners: Array = point_hits[key]
-				if province.province_id not in owners:
-					owners.append(province.province_id)
-
-	var pair_counts: Dictionary = {}
-	for owners: Array in point_hits.values():
-		if owners.size() < 2:
-			continue
-		for i in owners.size():
-			for j in range(i + 1, owners.size()):
-				var pair_key := _pair_key(str(owners[i]), str(owners[j]))
-				pair_counts[pair_key] = pair_counts.get(pair_key, 0) + 1
-
-	for pair_key in pair_counts:
-		if pair_counts[pair_key] >= MIN_SHARED_BORDER_POINTS:
-			var parts: PackedStringArray = pair_key.split("|")
-			adjacency._add_neighbor(parts[0], parts[1])
-
+	adjacency._build_from_segments(provinces)
+	adjacency._build_from_touching(provinces)
 	return adjacency
 
 
@@ -54,14 +34,82 @@ func get_neighbors(province_id: String) -> Array[String]:
 	return result
 
 
-static func _point_key(point: Vector2, step: float) -> String:
-	return "%d:%d" % [int(round(point.x / step)), int(round(point.y / step))]
+func _build_from_segments(provinces: Array[Province]) -> void:
+	var segment_owners: Dictionary = {}
+
+	for province in provinces:
+		for segment in province.get_border_segments():
+			if segment.size() < 2:
+				continue
+			var key: String = _segment_key(segment[0], segment[1])
+			if key.is_empty():
+				continue
+			if not segment_owners.has(key):
+				segment_owners[key] = []
+			var owners: Array = segment_owners[key]
+			if province.province_id not in owners:
+				owners.append(province.province_id)
+
+	for owners: Array in segment_owners.values():
+		if owners.size() < 2:
+			continue
+		for i in owners.size():
+			for j in range(i + 1, owners.size()):
+				_add_neighbor(str(owners[i]), str(owners[j]))
 
 
-static func _pair_key(a: String, b: String) -> String:
-	if a < b:
-		return "%s|%s" % [a, b]
-	return "%s|%s" % [b, a]
+func _build_from_touching(provinces: Array[Province]) -> void:
+	const MAX_CENTER_DISTANCE := 55.0
+	for i in provinces.size():
+		var province_a: Province = provinces[i]
+		for j in range(i + 1, provinces.size()):
+			var province_b: Province = provinces[j]
+			if province_a.country_id != province_b.country_id:
+				continue
+			if are_neighbors(province_a.province_id, province_b.province_id):
+				continue
+			if province_a.center.distance_to(province_b.center) > MAX_CENTER_DISTANCE:
+				continue
+			if _polygons_touch(province_a, province_b, TOUCH_DISTANCE):
+				_add_neighbor(province_a.province_id, province_b.province_id)
+
+
+func _polygons_touch(province_a: Province, province_b: Province, max_distance: float) -> bool:
+	for segment_a in province_a.get_border_segments():
+		if segment_a.size() < 2:
+			continue
+		for point in [segment_a[0], segment_a[1], (segment_a[0] + segment_a[1]) * 0.5]:
+			if _point_near_province(point, province_b, max_distance):
+				return true
+
+	for segment_b in province_b.get_border_segments():
+		if segment_b.size() < 2:
+			continue
+		for point in [segment_b[0], segment_b[1], (segment_b[0] + segment_b[1]) * 0.5]:
+			if _point_near_province(point, province_a, max_distance):
+				return true
+
+	return false
+
+
+func _point_near_province(point: Vector2, province: Province, max_distance: float) -> bool:
+	for segment in province.get_border_segments():
+		if segment.size() < 2:
+			continue
+		var closest: Vector2 = Geometry2D.get_closest_point_to_segment(point, segment[0], segment[1])
+		if point.distance_to(closest) <= max_distance:
+			return true
+	return false
+
+
+static func _segment_key(a: Vector2, b: Vector2, step: float = SEGMENT_STEP) -> String:
+	var qa := Vector2(round(a.x / step), round(a.y / step))
+	var qb := Vector2(round(b.x / step), round(b.y / step))
+	if qa == qb:
+		return ""
+	if qa.x < qb.x or (is_equal_approx(qa.x, qb.x) and qa.y < qb.y):
+		return "%d:%d|%d:%d" % [int(qa.x), int(qa.y), int(qb.x), int(qb.y)]
+	return "%d:%d|%d:%d" % [int(qb.x), int(qb.y), int(qa.x), int(qa.y)]
 
 
 func _add_neighbor(a: String, b: String) -> void:

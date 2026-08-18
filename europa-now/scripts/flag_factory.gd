@@ -1,12 +1,12 @@
 class_name FlagFactory
 extends RefCounted
 
-## Simplified offline flag patterns for European countries (prototype quality).
-
 const WIDTH := 40
 const HEIGHT := 28
+const FLAGS_DIR := "res://data/flags/"
 
 static var _cache: Dictionary = {}
+static var _missing_logged: Dictionary = {}
 
 
 static func get_placeholder_texture() -> Texture2D:
@@ -21,12 +21,35 @@ static func get_placeholder_texture() -> Texture2D:
 
 static func get_flag_texture(country: Country) -> Texture2D:
 	var code := _resolve_code(country)
+	if code.is_empty():
+		return get_placeholder_texture()
 	if _cache.has(code):
 		return _cache[code]
 
-	var texture := _build_flag(code)
+	var texture := _load_flag_image(code)
+	if texture == null:
+		texture = _build_flag(code)
+	if texture == null:
+		texture = get_placeholder_texture()
+
 	_cache[code] = texture
 	return texture
+
+
+static func _load_flag_image(code: String) -> Texture2D:
+	var path := "%s%s.png" % [FLAGS_DIR, code.to_lower()]
+	if not ResourceLoader.exists(path):
+		if not _missing_logged.has(code):
+			_missing_logged[code] = true
+		return null
+
+	var image := Image.new()
+	var load_error := image.load(ProjectSettings.globalize_path(path))
+	if load_error != OK or image.is_empty():
+		return null
+
+	image.resize(WIDTH, HEIGHT, Image.INTERPOLATE_BILINEAR)
+	return ImageTexture.create_from_image(image)
 
 
 static func _resolve_code(country: Country) -> String:
@@ -89,6 +112,146 @@ static func _iso_a3_to_a2(iso_a3: String) -> String:
 		"ARM": return "AM"
 		"AZE": return "AZ"
 		"KAZ": return "KZ"
+		"USA": return "US"
+		"CHN": return "CN"
+		"IND": return "IN"
+		"BRA": return "BR"
+		"CAN": return "CA"
+		"AUS": return "AU"
+		"JPN": return "JP"
+		"MEX": return "MX"
+		"ZAF": return "ZA"
+		"EGY": return "EG"
+		"SAU": return "SA"
+		"ARG": return "AR"
+		"IDN": return "ID"
+		"KOR": return "KR"
+		"PRK": return "KP"
+		"NGA": return "NG"
+		"PAK": return "PK"
+		"BGD": return "BD"
+		"PHL": return "PH"
+		"VNM": return "VN"
+		"THA": return "TH"
+		"IRN": return "IR"
+		"IRQ": return "IQ"
+		"ISR": return "IL"
+		"NZL": return "NZ"
+		"COL": return "CO"
+		"CHL": return "CL"
+		"PER": return "PE"
+		"VEN": return "VE"
+		"MYS": return "MY"
+		"SGP": return "SG"
+		"ARE": return "AE"
+		"QAT": return "QA"
+		"KWT": return "KW"
+		"OMN": return "OM"
+		"YEM": return "YE"
+		"JOR": return "JO"
+		"LBN": return "LB"
+		"SYR": return "SY"
+		"MAR": return "MA"
+		"DZA": return "DZ"
+		"TUN": return "TN"
+		"LBY": return "LY"
+		"KEN": return "KE"
+		"ETH": return "ET"
+		"TZA": return "TZ"
+		"UGA": return "UG"
+		"GHA": return "GH"
+		"CIV": return "CI"
+		"CMR": return "CM"
+		"COD": return "CD"
+		"COG": return "CG"
+		"SDN": return "SD"
+		"SSD": return "SS"
+		"MOZ": return "MZ"
+		"AGO": return "AO"
+		"ZMB": return "ZM"
+		"ZWE": return "ZW"
+		"BWA": return "BW"
+		"NAM": return "NA"
+		"SEN": return "SN"
+		"MLI": return "ML"
+		"NER": return "NE"
+		"TCD": return "TD"
+		"CAF": return "CF"
+		"SOM": return "SO"
+		"RWA": return "RW"
+		"BDI": return "BI"
+		"MWI": return "MW"
+		"MDG": return "MG"
+		"MRT": return "MR"
+		"GIN": return "GN"
+		"GNB": return "GW"
+		"SLE": return "SL"
+		"LBR": return "LR"
+		"TGO": return "TG"
+		"BEN": return "BJ"
+		"GMB": return "GM"
+		"GAB": return "GA"
+		"GNQ": return "GQ"
+		"STP": return "ST"
+		"CPV": return "CV"
+		"COM": return "KM"
+		"MUS": return "MU"
+		"SYC": return "SC"
+		"DJI": return "DJ"
+		"ERI": return "ER"
+		"SWZ": return "SZ"
+		"LSO": return "LS"
+		"AFG": return "AF"
+		"NPL": return "NP"
+		"LKA": return "LK"
+		"MMR": return "MM"
+		"KHM": return "KH"
+		"LAO": return "LA"
+		"MNG": return "MN"
+		"UZB": return "UZ"
+		"TKM": return "TM"
+		"TJK": return "TJ"
+		"KGZ": return "KG"
+		"BTN": return "BT"
+		"MDV": return "MV"
+		"BRN": return "BN"
+		"TLS": return "TL"
+		"FJI": return "FJ"
+		"PNG": return "PG"
+		"SLB": return "SB"
+		"VUT": return "VU"
+		"WSM": return "WS"
+		"TON": return "TO"
+		"KIR": return "KI"
+		"TUV": return "TV"
+		"NRU": return "NR"
+		"PLW": return "PW"
+		"MHL": return "MH"
+		"FSM": return "FM"
+		"CUB": return "CU"
+		"JAM": return "JM"
+		"HTI": return "HT"
+		"DOM": return "DO"
+		"PRI": return "PR"
+		"GTM": return "GT"
+		"BLZ": return "BZ"
+		"HND": return "HN"
+		"SLV": return "SV"
+		"NIC": return "NI"
+		"CRI": return "CR"
+		"PAN": return "PA"
+		"ECU": return "EC"
+		"BOL": return "BO"
+		"PRY": return "PY"
+		"URY": return "UY"
+		"GUY": return "GY"
+		"SUR": return "SR"
+		"TWN": return "TW"
+		"PSE": return "PS"
+		"PSX": return "PS"
+		"SAH": return "EH"
+		"ESH": return "EH"
+		"SOL": return "SO"
 		_: return ""
 
 
@@ -97,8 +260,7 @@ static func _build_flag(code: String) -> Texture2D:
 	var pattern: Dictionary = _PATTERNS.get(code, {})
 
 	if pattern.is_empty():
-		image.fill(Color(0.28, 0.32, 0.38, 1.0))
-		return ImageTexture.create_from_image(image)
+		return null
 
 	match str(pattern.get("type", "")):
 		"h":
@@ -107,7 +269,7 @@ static func _build_flag(code: String) -> Texture2D:
 			_draw_vertical_stripes(image, pattern.get("colors", []))
 		"cross":
 			_draw_cross_flag(image, pattern)
-		_:
+		"solid", _:
 			image.fill(pattern.get("color", Color(0.28, 0.32, 0.38, 1.0)))
 
 	return ImageTexture.create_from_image(image)
