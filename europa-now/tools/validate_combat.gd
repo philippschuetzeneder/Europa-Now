@@ -62,18 +62,18 @@ func _make_harness() -> Dictionary:
 		_make_province("DEU_b", "DEU"),
 		_make_province("AUT_a", "AUT"),
 	]
-	var adjacency := ProvinceAdjacencyScript.build(provinces)
-	var provinces_by_id := {}
+	var adjacency: ProvinceAdjacency = ProvinceAdjacencyScript.build(provinces)
+	var provinces_by_id: Dictionary = {}
 	for province in provinces:
 		provinces_by_id[province.province_id] = province
 
-	var war := WarStateScript.new()
+	var war: WarState = WarStateScript.new()
 	war.set_war("DEU", "AUT", true)
 
-	var unit_manager := _MockUnitManager.new()
+	var unit_manager: _MockUnitManager = _MockUnitManager.new()
 	unit_manager.setup(provinces_by_id, adjacency)
 
-	var combat_manager := CombatManagerScript.new()
+	var combat_manager: CombatManager = CombatManagerScript.new()
 	combat_manager.initialize(unit_manager, provinces, adjacency, war)
 	unit_manager.combat_manager = combat_manager
 
@@ -89,12 +89,12 @@ func _make_harness() -> Dictionary:
 
 
 func _test_peaceful_capture() -> void:
-	var harness := _make_harness()
+	var harness: Dictionary = _make_harness()
 	var unit_manager: _MockUnitManager = harness["unit_manager"]
 	var combat_manager: CombatManager = harness["combat_manager"]
 	var provinces_by_id: Dictionary = harness["provinces_by_id"]
 
-	var attacker := unit_manager.spawn_unit("GER_1", "DEU", "DEU_a")
+	var attacker: _MockUnit = unit_manager.spawn_unit("GER_1", "DEU", "DEU_a")
 	unit_manager.move_unit_to(attacker, "AUT_a")
 	unit_manager.complete_pending_arrivals()
 
@@ -104,35 +104,35 @@ func _test_peaceful_capture() -> void:
 
 
 func _test_combat_starts_on_contact() -> void:
-	var harness := _make_harness()
+	var harness: Dictionary = _make_harness()
 	var unit_manager: _MockUnitManager = harness["unit_manager"]
 	var combat_manager: CombatManager = harness["combat_manager"]
 
 	unit_manager.spawn_unit("AUT_1", "AUT", "AUT_a")
-	var attacker := unit_manager.spawn_unit("GER_1", "DEU", "DEU_a")
+	var attacker: _MockUnit = unit_manager.spawn_unit("GER_1", "DEU", "DEU_a")
 	unit_manager.move_unit_to(attacker, "AUT_a")
 	unit_manager.complete_pending_arrivals()
 
-	var combat := combat_manager.get_combat_at_province("AUT_a")
+	var combat: CombatState = combat_manager.get_combat_at_province("AUT_a")
 	_assert_true(combat != null and combat.is_active(), "TEST 2: Kampf startet bei Kontakt")
 
 
 func _test_defender_wins() -> void:
-	var harness := _make_harness()
+	var harness: Dictionary = _make_harness()
 	var unit_manager: _MockUnitManager = harness["unit_manager"]
 	var combat_manager: CombatManager = harness["combat_manager"]
 	var provinces_by_id: Dictionary = harness["provinces_by_id"]
 
-	var defender := unit_manager.spawn_unit("AUT_1", "AUT", "AUT_a", 120_000, 120)
-	var attacker := unit_manager.spawn_unit("GER_1", "DEU", "DEU_a", 20_000, 20)
+	var defender: _MockUnit = unit_manager.spawn_unit("AUT_1", "AUT", "AUT_a", 120_000, 120)
+	var attacker: _MockUnit = unit_manager.spawn_unit("GER_1", "DEU", "DEU_a", 20_000, 20)
 	unit_manager.move_unit_to(attacker, "AUT_a")
 	unit_manager.complete_pending_arrivals()
 
 	for _i in CombatCalculatorScript.MAX_COMBAT_DAYS + 2:
 		combat_manager.on_day_advanced(GameTime.current_date)
 
-	var combat := combat_manager.get_combat_at_province("AUT_a")
-	var ended := combat == null or not combat.is_active()
+	var combat: CombatState = combat_manager.get_combat_at_province("AUT_a")
+	var ended: bool = combat == null or not combat.is_active()
 	_assert_true(ended, "TEST 3: Kampf endet")
 	var province: Province = provinces_by_id["AUT_a"]
 	_assert_true(province.controller_country_id == "AUT", "TEST 3: Verteidiger behaelt Provinz")
@@ -140,13 +140,13 @@ func _test_defender_wins() -> void:
 
 
 func _test_attacker_wins() -> void:
-	var harness := _make_harness()
+	var harness: Dictionary = _make_harness()
 	var unit_manager: _MockUnitManager = harness["unit_manager"]
 	var combat_manager: CombatManager = harness["combat_manager"]
 	var provinces_by_id: Dictionary = harness["provinces_by_id"]
 
 	unit_manager.spawn_unit("AUT_1", "AUT", "AUT_a", 20_000, 20)
-	var attacker := unit_manager.spawn_unit("GER_1", "DEU", "DEU_a", 120_000, 120)
+	var attacker: _MockUnit = unit_manager.spawn_unit("GER_1", "DEU", "DEU_a", 120_000, 120)
 	unit_manager.move_unit_to(attacker, "AUT_a")
 	unit_manager.complete_pending_arrivals()
 
@@ -158,52 +158,52 @@ func _test_attacker_wins() -> void:
 
 
 func _test_pause_stops_combat() -> void:
-	var harness := _make_harness()
+	var harness: Dictionary = _make_harness()
 	var unit_manager: _MockUnitManager = harness["unit_manager"]
 	var combat_manager: CombatManager = harness["combat_manager"]
 
 	unit_manager.spawn_unit("AUT_1", "AUT", "AUT_a")
-	var attacker := unit_manager.spawn_unit("GER_1", "DEU", "DEU_a")
+	var attacker: _MockUnit = unit_manager.spawn_unit("GER_1", "DEU", "DEU_a")
 	unit_manager.move_unit_to(attacker, "AUT_a")
 	unit_manager.complete_pending_arrivals()
 
-	var combat := combat_manager.get_combat_at_province("AUT_a")
-	var days_before := combat.days_fought if combat != null else 0
+	var combat: CombatState = combat_manager.get_combat_at_province("AUT_a")
+	var days_before: int = combat.days_fought if combat != null else 0
 	# Pause haelt den Tag-Tick an; ohne day_advanced kein Kampffortschritt.
 	_assert_true(combat != null and combat.days_fought == days_before, "TEST 5: Ohne Zeit-Tick kein Kampffortschritt")
 
 
 func _test_speed_affects_combat() -> void:
-	var harness := _make_harness()
+	var harness: Dictionary = _make_harness()
 	var unit_manager: _MockUnitManager = harness["unit_manager"]
 	var combat_manager: CombatManager = harness["combat_manager"]
 
 	unit_manager.spawn_unit("AUT_1", "AUT", "AUT_a")
-	var attacker := unit_manager.spawn_unit("GER_1", "DEU", "DEU_a")
+	var attacker: _MockUnit = unit_manager.spawn_unit("GER_1", "DEU", "DEU_a")
 	unit_manager.move_unit_to(attacker, "AUT_a")
 	unit_manager.complete_pending_arrivals()
 
-	var combat := combat_manager.get_combat_at_province("AUT_a")
+	var combat: CombatState = combat_manager.get_combat_at_province("AUT_a")
 	for _i in 3:
 		combat_manager.on_day_advanced(GameTime.current_date)
-	var days_after_three := combat.days_fought
+	var days_after_three: int = combat.days_fought
 	_assert_true(days_after_three >= 3, "TEST 6: Kampf laeuft ueber mehrere Tage")
 
 
 func _test_multiple_armies() -> void:
-	var harness := _make_harness()
+	var harness: Dictionary = _make_harness()
 	var unit_manager: _MockUnitManager = harness["unit_manager"]
 	var combat_manager: CombatManager = harness["combat_manager"]
 
 	unit_manager.spawn_unit("AUT_1", "AUT", "AUT_a")
 	unit_manager.spawn_unit("AUT_2", "AUT", "AUT_a")
-	var attacker_a := unit_manager.spawn_unit("GER_1", "DEU", "DEU_a")
-	var attacker_b := unit_manager.spawn_unit("GER_2", "DEU", "DEU_a")
+	var attacker_a: _MockUnit = unit_manager.spawn_unit("GER_1", "DEU", "DEU_a")
+	var attacker_b: _MockUnit = unit_manager.spawn_unit("GER_2", "DEU", "DEU_a")
 	unit_manager.move_unit_to(attacker_a, "AUT_a")
 	unit_manager.move_unit_to(attacker_b, "AUT_a")
 	unit_manager.complete_pending_arrivals()
 
-	var combat := combat_manager.get_combat_at_province("AUT_a")
+	var combat: CombatState = combat_manager.get_combat_at_province("AUT_a")
 	_assert_true(combat != null, "TEST 7: Kampf existiert")
 	_assert_true(combat.attacker_unit_ids.size() >= 2, "TEST 7: Mehrere Angreifer im Kampf")
 	_assert_true(combat.defender_unit_ids.size() >= 2, "TEST 7: Mehrere Verteidiger im Kampf")
@@ -211,18 +211,18 @@ func _test_multiple_armies() -> void:
 
 func _test_retreat_without_route() -> void:
 	var provinces: Array[Province] = [_make_province("AUT_a", "AUT")]
-	var adjacency := ProvinceAdjacencyScript.build(provinces)
-	var provinces_by_id := {"AUT_a": provinces[0]}
+	var adjacency: ProvinceAdjacency = ProvinceAdjacencyScript.build(provinces)
+	var provinces_by_id: Dictionary = {"AUT_a": provinces[0]}
 
-	var war := WarStateScript.new()
+	var war: WarState = WarStateScript.new()
 	war.set_war("DEU", "AUT", true)
-	var unit_manager := _MockUnitManager.new()
+	var unit_manager: _MockUnitManager = _MockUnitManager.new()
 	unit_manager.setup(provinces_by_id, adjacency)
-	var combat_manager := CombatManagerScript.new()
+	var combat_manager: CombatManager = CombatManagerScript.new()
 	combat_manager.initialize(unit_manager, provinces, adjacency, war)
 	unit_manager.combat_manager = combat_manager
 
-	var defender := 	unit_manager.spawn_unit("AUT_1", "AUT", "AUT_a", 10_000, 10)
+	var defender: _MockUnit = unit_manager.spawn_unit("AUT_1", "AUT", "AUT_a", 10_000, 10)
 	unit_manager.spawn_unit("GER_1", "DEU", "AUT_a", 200_000, 200)
 	combat_manager.handle_province_after_arrivals("AUT_a")
 
@@ -303,9 +303,9 @@ class _MockUnitManager:
 
 
 	func complete_pending_arrivals() -> void:
-		var arrivals := _pending_arrivals.duplicate()
+		var arrivals: Array = _pending_arrivals.duplicate()
 		_pending_arrivals.clear()
-		var provinces_touched := {}
+		var provinces_touched: Dictionary = {}
 		for entry in arrivals:
 			var unit = entry["unit"]
 			var province_id: String = entry["province_id"]

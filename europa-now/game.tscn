@@ -1,4 +1,4 @@
-[gd_scene load_steps=13 format=3 uid="uid://b2tetvget8rx"]
+[gd_scene load_steps=18 format=3 uid="uid://b2tetvget8rx"]
 
 [ext_resource type="Script" path="res://scripts/game.gd" id="1_game"]
 [ext_resource type="Script" path="res://scripts/europe_map.gd" id="2_map"]
@@ -9,6 +9,11 @@
 [ext_resource type="Script" path="res://scripts/debug_log.gd" id="7_debug"]
 [ext_resource type="Script" path="res://scripts/capitals_layer.gd" id="8_capitals"]
 [ext_resource type="Script" path="res://scripts/provinces_layer.gd" id="9_provinces"]
+[ext_resource type="Script" path="res://scripts/diplomacy_panel.gd" id="10_diplomacy"]
+[ext_resource type="Script" path="res://scripts/recruitment_panel.gd" id="11_recruitment"]
+[ext_resource type="Script" path="res://scripts/game_menu.gd" id="12_menu"]
+[ext_resource type="Script" path="res://scripts/army_info_panel.gd" id="13_army"]
+[ext_resource type="Script" path="res://scripts/foreign_country_panel.gd" id="14_foreign"]
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_panel"]
 bg_color = Color(0.08, 0.1, 0.14, 0.88)
@@ -66,11 +71,14 @@ script = ExtResource("3_camera")
 [node name="UI" type="CanvasLayer" parent="."]
 
 [node name="LeftPanel" type="MarginContainer" parent="UI"]
-anchors_preset = 0
-offset_right = 300.0
-offset_bottom = 400.0
+anchors_preset = 10
+anchor_right = 1.0
+offset_right = -420.0
+offset_bottom = 150.0
+grow_horizontal = 2
 theme_override_constants/margin_left = 16
 theme_override_constants/margin_top = 16
+theme_override_constants/margin_right = 16
 
 [node name="InfoPanel" type="PanelContainer" parent="UI/LeftPanel"]
 custom_minimum_size = Vector2(260, 0)
@@ -79,9 +87,10 @@ size_flags_vertical = 0
 theme_override_styles/panel = SubResource("StyleBoxFlat_panel")
 script = ExtResource("4_info")
 
-[node name="VBoxContainer" type="VBoxContainer" parent="UI/LeftPanel/InfoPanel"]
+[node name="VBoxContainer" type="HFlowContainer" parent="UI/LeftPanel/InfoPanel"]
 layout_mode = 2
-theme_override_constants/separation = 6
+theme_override_constants/h_separation = 12
+theme_override_constants/v_separation = 4
 
 [node name="Header" type="HBoxContainer" parent="UI/LeftPanel/InfoPanel/VBoxContainer"]
 layout_mode = 2
@@ -149,12 +158,385 @@ theme_override_font_sizes/font_size = 13
 autowrap_mode = 3
 text = ""
 
+[node name="WarLabel" type="Label" parent="UI/LeftPanel/InfoPanel/VBoxContainer"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.98, 0.72, 0.72, 1)
+theme_override_font_sizes/font_size = 14
+autowrap_mode = 3
+text = "Krieg: -"
+
+[node name="TreasuryLabel" type="Label" parent="UI/LeftPanel/InfoPanel/VBoxContainer"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.72, 0.88, 0.76, 1)
+theme_override_font_sizes/font_size = 13
+text = "Staatskasse: -"
+
+[node name="IncomeLabel" type="Label" parent="UI/LeftPanel/InfoPanel/VBoxContainer"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.72, 0.88, 0.76, 1)
+theme_override_font_sizes/font_size = 13
+text = "Einkommen: -"
+
+[node name="ExpensesLabel" type="Label" parent="UI/LeftPanel/InfoPanel/VBoxContainer"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.72, 0.82, 0.72, 1)
+theme_override_font_sizes/font_size = 13
+text = "Ausgaben: -"
+
+[node name="MilitaryBudgetLabel" type="Label" parent="UI/LeftPanel/InfoPanel/VBoxContainer"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.82, 0.76, 0.62, 1)
+theme_override_font_sizes/font_size = 13
+text = "Militaerbudget: -"
+
+[node name="RecruitableLabel" type="Label" parent="UI/LeftPanel/InfoPanel/VBoxContainer"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.82, 0.86, 0.98, 1)
+theme_override_font_sizes/font_size = 13
+text = "Rekrutierbares Personal: -"
+
+[node name="RecruitmentHeader" type="Label" parent="UI/LeftPanel/InfoPanel/VBoxContainer"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.98, 0.86, 0.64, 1)
+theme_override_font_sizes/font_size = 14
+text = "REKRUTIERUNG"
+
+[node name="RecruitProvinceLabel" type="Label" parent="UI/LeftPanel/InfoPanel/VBoxContainer"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.82, 0.88, 0.98, 1)
+theme_override_font_sizes/font_size = 13
+text = "Provinz: -"
+
+[node name="RecruitSoldiersSpinBox" type="SpinBox" parent="UI/LeftPanel/InfoPanel/VBoxContainer"]
+custom_minimum_size = Vector2(0, 30)
+layout_mode = 2
+max_value = 1000000.0
+step = 1000.0
+value = 10000.0
+allow_greater = true
+suffix = " Soldaten"
+
+[node name="RecruitCostLabel" type="Label" parent="UI/LeftPanel/InfoPanel/VBoxContainer"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.76, 0.82, 0.92, 1)
+theme_override_font_sizes/font_size = 13
+text = "Kosten: -"
+
+[node name="RecruitDurationLabel" type="Label" parent="UI/LeftPanel/InfoPanel/VBoxContainer"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.76, 0.82, 0.92, 1)
+theme_override_font_sizes/font_size = 13
+text = "Ausbildungszeit: -"
+
+[node name="RecruitManpowerLabel" type="Label" parent="UI/LeftPanel/InfoPanel/VBoxContainer"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.76, 0.82, 0.92, 1)
+theme_override_font_sizes/font_size = 13
+text = "Verfuegbar: -"
+
+[node name="RecruitButton" type="Button" parent="UI/LeftPanel/InfoPanel/VBoxContainer"]
+custom_minimum_size = Vector2(0, 32)
+layout_mode = 2
+text = "Armee rekrutieren"
+
+[node name="RecruitErrorLabel" type="Label" parent="UI/LeftPanel/InfoPanel/VBoxContainer"]
+layout_mode = 2
+theme_override_colors/font_color = Color(1, 0.58, 0.52, 1)
+theme_override_font_sizes/font_size = 12
+autowrap_mode = 3
+text = ""
+
+[node name="DiplomacyHeader" type="Label" parent="UI/LeftPanel/InfoPanel/VBoxContainer"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.72, 0.84, 0.98, 1)
+theme_override_font_sizes/font_size = 14
+text = "DIPLOMATIE"
+
+[node name="DiplomacyTargetOption" type="OptionButton" parent="UI/LeftPanel/InfoPanel/VBoxContainer"]
+custom_minimum_size = Vector2(0, 30)
+layout_mode = 2
+
+[node name="DiplomacyRelationsLabel" type="Label" parent="UI/LeftPanel/InfoPanel/VBoxContainer"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.76, 0.84, 0.94, 1)
+theme_override_font_sizes/font_size = 12
+autowrap_mode = 3
+text = "Beziehungen: -"
+
+[node name="DiplomacyRelationsToggle" type="Button" parent="UI/LeftPanel/InfoPanel/VBoxContainer"]
+custom_minimum_size = Vector2(0, 26)
+layout_mode = 2
+text = "Alle Beziehungen anzeigen"
+
+[node name="DiplomacyRelationsScroll" type="ScrollContainer" parent="UI/LeftPanel/InfoPanel/VBoxContainer"]
+custom_minimum_size = Vector2(0, 110)
+layout_mode = 2
+horizontal_scroll_mode = 0
+vertical_scroll_mode = 1
+
+[node name="DiplomacyAllRelationsLabel" type="Label" parent="UI/LeftPanel/InfoPanel/VBoxContainer/DiplomacyRelationsScroll"]
+custom_minimum_size = Vector2(0, 0)
+layout_mode = 2
+theme_override_colors/font_color = Color(0.72, 0.8, 0.92, 1)
+theme_override_font_sizes/font_size = 12
+autowrap_mode = 3
+text = ""
+
+[node name="DiplomacyRelationshipLabel" type="Label" parent="UI/LeftPanel/InfoPanel/VBoxContainer"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.82, 0.88, 0.98, 1)
+theme_override_font_sizes/font_size = 13
+text = "Beziehung: -"
+
+[node name="DiplomacyStatusLabel" type="Label" parent="UI/LeftPanel/InfoPanel/VBoxContainer"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.82, 0.88, 0.98, 1)
+theme_override_font_sizes/font_size = 13
+text = "Status: -"
+
+[node name="DiplomacyAllianceLabel" type="Label" parent="UI/LeftPanel/InfoPanel/VBoxContainer"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.82, 0.88, 0.98, 1)
+theme_override_font_sizes/font_size = 13
+text = "Buendnis: -"
+
+[node name="DiplomacyNapLabel" type="Label" parent="UI/LeftPanel/InfoPanel/VBoxContainer"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.82, 0.88, 0.98, 1)
+theme_override_font_sizes/font_size = 13
+text = "Nichtangriffspakt: -"
+
+[node name="DiplomacyActionGrid" type="GridContainer" parent="UI/LeftPanel/InfoPanel/VBoxContainer"]
+layout_mode = 2
+columns = 2
+theme_override_constants/h_separation = 4
+theme_override_constants/v_separation = 4
+
+[node name="DeclareWarButton" type="Button" parent="UI/LeftPanel/InfoPanel/VBoxContainer/DiplomacyActionGrid"]
+custom_minimum_size = Vector2(120, 30)
+layout_mode = 2
+text = "Krieg erklaeren"
+
+[node name="OfferPeaceButton" type="Button" parent="UI/LeftPanel/InfoPanel/VBoxContainer/DiplomacyActionGrid"]
+custom_minimum_size = Vector2(120, 30)
+layout_mode = 2
+text = "Frieden anbieten"
+
+[node name="OfferAllianceButton" type="Button" parent="UI/LeftPanel/InfoPanel/VBoxContainer/DiplomacyActionGrid"]
+custom_minimum_size = Vector2(120, 30)
+layout_mode = 2
+text = "Buendnis anbieten"
+
+[node name="OfferNapButton" type="Button" parent="UI/LeftPanel/InfoPanel/VBoxContainer/DiplomacyActionGrid"]
+custom_minimum_size = Vector2(120, 30)
+layout_mode = 2
+text = "NAP anbieten"
+
+[node name="DiplomacyPendingLabel" type="Label" parent="UI/LeftPanel/InfoPanel/VBoxContainer"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.98, 0.84, 0.62, 1)
+theme_override_font_sizes/font_size = 12
+autowrap_mode = 3
+text = ""
+
+[node name="AcceptDiplomacyButton" type="Button" parent="UI/LeftPanel/InfoPanel/VBoxContainer"]
+custom_minimum_size = Vector2(0, 30)
+layout_mode = 2
+text = "Anfrage annehmen"
+
+[node name="RejectDiplomacyButton" type="Button" parent="UI/LeftPanel/InfoPanel/VBoxContainer"]
+custom_minimum_size = Vector2(0, 30)
+layout_mode = 2
+text = "Anfrage ablehnen"
+
+[node name="GameMenuButton" type="Button" parent="UI"]
+offset_left = 16.0
+offset_top = 164.0
+offset_right = 140.0
+offset_bottom = 198.0
+text = "Spielmenue"
+
+[node name="ForeignCountryPanel" type="PanelContainer" parent="UI"]
+offset_left = 16.0
+offset_top = 240.0
+offset_right = 360.0
+offset_bottom = 460.0
+theme_override_styles/panel = SubResource("StyleBoxFlat_panel")
+script = ExtResource("14_foreign")
+
+[node name="ArmyInfoPanel" type="PanelContainer" parent="UI"]
+offset_left = 410.0
+offset_top = 240.0
+offset_right = 720.0
+offset_bottom = 500.0
+theme_override_styles/panel = SubResource("StyleBoxFlat_panel")
+script = ExtResource("13_army")
+
+[node name="GameMenuPanel" type="PanelContainer" parent="UI"]
+offset_left = 16.0
+offset_top = 202.0
+offset_right = 260.0
+offset_bottom = 350.0
+theme_override_styles/panel = SubResource("StyleBoxFlat_panel")
+script = ExtResource("12_menu")
+
+[node name="VBox" type="VBoxContainer" parent="UI/GameMenuPanel"]
+layout_mode = 2
+theme_override_constants/separation = 6
+
+[node name="SaveButton" type="Button" parent="UI/GameMenuPanel/VBox"]
+layout_mode = 2
+text = "Spiel speichern"
+
+[node name="LoadButton" type="Button" parent="UI/GameMenuPanel/VBox"]
+layout_mode = 2
+text = "Spiel laden"
+
+[node name="CloseButton" type="Button" parent="UI/GameMenuPanel/VBox"]
+layout_mode = 2
+text = "Schliessen"
+
+[node name="DiplomacyPanel" type="PanelContainer" parent="UI"]
+offset_left = 16.0
+offset_top = 520.0
+offset_right = 380.0
+offset_bottom = 820.0
+theme_override_styles/panel = SubResource("StyleBoxFlat_panel")
+script = ExtResource("10_diplomacy")
+
+[node name="Margin" type="MarginContainer" parent="UI/DiplomacyPanel"]
+layout_mode = 2
+theme_override_constants/margin_left = 14
+theme_override_constants/margin_top = 12
+theme_override_constants/margin_right = 14
+theme_override_constants/margin_bottom = 12
+
+[node name="VBox" type="VBoxContainer" parent="UI/DiplomacyPanel/Margin"]
+layout_mode = 2
+theme_override_constants/separation = 7
+
+[node name="Title" type="Label" parent="UI/DiplomacyPanel/Margin/VBox"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 17
+text = "Diplomatie"
+
+[node name="Relationship" type="Label" parent="UI/DiplomacyPanel/Margin/VBox"]
+layout_mode = 2
+text = "Beziehung: -"
+
+[node name="Status" type="Label" parent="UI/DiplomacyPanel/Margin/VBox"]
+layout_mode = 2
+text = "Status: -"
+
+[node name="Alliance" type="Label" parent="UI/DiplomacyPanel/Margin/VBox"]
+layout_mode = 2
+text = "Buendnis: -"
+
+[node name="Nap" type="Label" parent="UI/DiplomacyPanel/Margin/VBox"]
+layout_mode = 2
+text = "NAP: -"
+
+[node name="Actions" type="VBoxContainer" parent="UI/DiplomacyPanel/Margin/VBox"]
+layout_mode = 2
+theme_override_constants/separation = 4
+
+[node name="DeclareWar" type="Button" parent="UI/DiplomacyPanel/Margin/VBox/Actions"]
+layout_mode = 2
+text = "Krieg erklaeren"
+
+[node name="OfferPeace" type="Button" parent="UI/DiplomacyPanel/Margin/VBox/Actions"]
+layout_mode = 2
+text = "Frieden anbieten"
+
+[node name="OfferAlliance" type="Button" parent="UI/DiplomacyPanel/Margin/VBox/Actions"]
+layout_mode = 2
+text = "Buendnis anbieten"
+
+[node name="OfferNap" type="Button" parent="UI/DiplomacyPanel/Margin/VBox/Actions"]
+layout_mode = 2
+text = "NAP anbieten"
+
+[node name="Close" type="Button" parent="UI/DiplomacyPanel/Margin/VBox"]
+layout_mode = 2
+text = "Schliessen"
+
+[node name="RecruitmentPanel" type="PanelContainer" parent="UI"]
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -190.0
+offset_top = -150.0
+offset_right = 190.0
+offset_bottom = 150.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_styles/panel = SubResource("StyleBoxFlat_panel")
+script = ExtResource("11_recruitment")
+
+[node name="Margin" type="MarginContainer" parent="UI/RecruitmentPanel"]
+layout_mode = 2
+theme_override_constants/margin_left = 14
+theme_override_constants/margin_top = 12
+theme_override_constants/margin_right = 14
+theme_override_constants/margin_bottom = 12
+
+[node name="VBox" type="VBoxContainer" parent="UI/RecruitmentPanel/Margin"]
+layout_mode = 2
+theme_override_constants/separation = 7
+
+[node name="Title" type="Label" parent="UI/RecruitmentPanel/Margin/VBox"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 17
+text = "Armee rekrutieren"
+
+[node name="Province" type="Label" parent="UI/RecruitmentPanel/Margin/VBox"]
+layout_mode = 2
+text = "Provinz: -"
+
+[node name="Soldiers" type="SpinBox" parent="UI/RecruitmentPanel/Margin/VBox"]
+custom_minimum_size = Vector2(0, 30)
+layout_mode = 2
+max_value = 1000000.0
+step = 1000.0
+value = 10000.0
+suffix = " Soldaten"
+
+[node name="Cost" type="Label" parent="UI/RecruitmentPanel/Margin/VBox"]
+layout_mode = 2
+text = "Kosten: -"
+
+[node name="Duration" type="Label" parent="UI/RecruitmentPanel/Margin/VBox"]
+layout_mode = 2
+text = "Ausbildungszeit: -"
+
+[node name="Available" type="Label" parent="UI/RecruitmentPanel/Margin/VBox"]
+layout_mode = 2
+text = "Verfuegbar: -"
+
+[node name="Recruit" type="Button" parent="UI/RecruitmentPanel/Margin/VBox"]
+layout_mode = 2
+text = "Rekrutieren"
+
+[node name="Message" type="Label" parent="UI/RecruitmentPanel/Margin/VBox"]
+layout_mode = 2
+autowrap_mode = 3
+text = ""
+
+[node name="Close" type="Button" parent="UI/RecruitmentPanel/Margin/VBox"]
+layout_mode = 2
+text = "Schliessen"
+
 [node name="TopBar" type="CenterContainer" parent="UI"]
-anchors_preset = 10
+anchors_preset = 12
+anchor_left = 1.0
 anchor_right = 1.0
 offset_top = 16.0
 offset_bottom = 72.0
-grow_horizontal = 2
+offset_left = -400.0
+offset_right = -16.0
+grow_horizontal = 0
 
 [node name="TimeControls" type="PanelContainer" parent="UI/TopBar"]
 layout_mode = 2
@@ -197,14 +579,15 @@ text = "5x"
 
 [node name="DebugPanel" type="PanelContainer" parent="UI"]
 anchors_preset = 3
-anchor_left = 0.0
+anchor_left = 1.0
 anchor_top = 1.0
-anchor_right = 0.0
+anchor_right = 1.0
 anchor_bottom = 1.0
-offset_left = 16.0
+offset_left = -520.0
 offset_top = -220.0
-offset_right = 520.0
+offset_right = -16.0
 offset_bottom = -16.0
+grow_horizontal = 0
 grow_vertical = 0
 theme_override_styles/panel = SubResource("StyleBoxFlat_debug")
 script = ExtResource("7_debug")

@@ -38,7 +38,8 @@ func setup(unit_data: UnitData) -> void:
 	add_child(_collision)
 
 	_type_label = Label.new()
-	_type_label.text = "A"
+	_type_label.text = unit_data.owner_country_id.substr(0, 1)
+	_apply_country_style()
 	_type_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	_type_label.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
 	_type_label.position = Vector2(-4, -6)
@@ -94,19 +95,51 @@ func is_moving() -> bool:
 	return data.is_moving
 
 
-func place_on_province(province: Province) -> void:
-	global_position = province.get_placement_position()
+func place_on_province(province: Province, slot_index: int = 0, slot_count: int = 1) -> void:
+	var base_position := province.get_placement_position()
+	if slot_count <= 1:
+		global_position = base_position
+		return
+	var spacing := 10.0
+	var offset_x := (float(slot_index) - (float(slot_count) - 1.0) * 0.5) * spacing
+	global_position = base_position + Vector2(offset_x, 0.0)
 
 
 func _apply_fill_color() -> void:
 	if not is_instance_valid(_fill):
 		return
+	var base_color := _get_country_color()
 	if _is_in_combat:
-		_fill.color = Color(0.95, 0.55, 0.18) if _is_selected else Color(0.82, 0.42, 0.12)
+		_fill.color = base_color.lightened(0.25) if _is_selected else base_color.lightened(0.12)
 	elif data.is_retreating:
-		_fill.color = Color(0.75, 0.75, 0.2) if _is_selected else Color(0.62, 0.62, 0.16)
+		_fill.color = base_color.darkened(0.15) if _is_selected else base_color.darkened(0.28)
 	else:
-		_fill.color = Color(0.95, 0.28, 0.22) if _is_selected else Color(0.82, 0.16, 0.16)
+		_fill.color = base_color.lightened(0.18) if _is_selected else base_color
+
+
+func _apply_country_style() -> void:
+	_apply_fill_color()
+
+
+func _get_country_color() -> Color:
+	match data.owner_country_id:
+		"DEU":
+			return Color(0.12, 0.22, 0.62)
+		"AUT":
+			return Color(0.82, 0.16, 0.16)
+		"CZE":
+			return Color(0.16, 0.58, 0.24)
+		"POL":
+			return Color(0.78, 0.18, 0.22)
+		"FRA":
+			return Color(0.18, 0.32, 0.72)
+		_:
+			var hash_value: int = absi(data.owner_country_id.hash())
+			return Color(
+				0.35 + float(hash_value % 100) / 200.0,
+				0.35 + float((hash_value / 100) % 100) / 200.0,
+				0.35 + float((hash_value / 10000) % 100) / 200.0
+			)
 
 
 func _create_circle_polygon(radius: float, color: Color) -> Polygon2D:

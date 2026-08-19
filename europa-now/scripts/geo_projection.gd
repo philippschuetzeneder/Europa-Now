@@ -51,6 +51,10 @@ static func world_view_bounds() -> Rect2:
 	return Rect2(north_west, south_east - north_west)
 
 
+static func bavaria_focus_position() -> Vector2:
+	return project(11.575, 48.137)
+
+
 static func europe_bavaria_view_bounds() -> Rect2:
 	var north_west := project(-2.0, 54.0)
 	var south_east := project(20.0, 45.0)

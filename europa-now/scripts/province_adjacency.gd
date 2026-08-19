@@ -17,6 +17,7 @@ static func build(provinces: Array[Province]) -> ProvinceAdjacency:
 
 	adjacency._build_from_segments(provinces)
 	adjacency._build_from_touching(provinces)
+	adjacency._build_cross_border_touching(provinces)
 	return adjacency
 
 
@@ -60,18 +61,58 @@ func _build_from_segments(provinces: Array[Province]) -> void:
 
 func _build_from_touching(provinces: Array[Province]) -> void:
 	const MAX_CENTER_DISTANCE := 55.0
+	_build_touching_from_grid(provinces, MAX_CENTER_DISTANCE, TOUCH_DISTANCE, false)
+
+
+func _build_cross_border_touching(provinces: Array[Province]) -> void:
+	const MAX_CENTER_DISTANCE := 70.0
+	const CROSS_BORDER_TOUCH := 1.5
+	_build_touching_from_grid(provinces, MAX_CENTER_DISTANCE, CROSS_BORDER_TOUCH, true)
+
+
+func _build_touching_from_grid(
+	provinces: Array[Province],
+	max_center_distance: float,
+	touch_distance: float,
+	cross_border_only: bool
+) -> void:
+	var cell_size := max_center_distance
+	var grid: Dictionary = {}
+	for index in provinces.size():
+		var province: Province = provinces[index]
+		var cell := Vector2i(
+			floori(province.center.x / cell_size),
+			floori(province.center.y / cell_size)
+		)
+		if not grid.has(cell):
+			grid[cell] = []
+		var bucket: Array = grid[cell]
+		bucket.append(index)
+
 	for i in provinces.size():
 		var province_a: Province = provinces[i]
-		for j in range(i + 1, provinces.size()):
-			var province_b: Province = provinces[j]
-			if province_a.country_id != province_b.country_id:
-				continue
-			if are_neighbors(province_a.province_id, province_b.province_id):
-				continue
-			if province_a.center.distance_to(province_b.center) > MAX_CENTER_DISTANCE:
-				continue
-			if _polygons_touch(province_a, province_b, TOUCH_DISTANCE):
-				_add_neighbor(province_a.province_id, province_b.province_id)
+		var cell := Vector2i(
+			floori(province_a.center.x / cell_size),
+			floori(province_a.center.y / cell_size)
+		)
+		for cell_y in range(cell.y - 1, cell.y + 2):
+			for cell_x in range(cell.x - 1, cell.x + 2):
+				var candidates: Array = grid.get(Vector2i(cell_x, cell_y), [])
+				for j in candidates:
+					if j <= i:
+						continue
+					var province_b: Province = provinces[j]
+					if cross_border_only:
+						if province_a.country_id == province_b.country_id:
+							continue
+					elif province_a.country_id != province_b.country_id:
+						continue
+					if are_neighbors(province_a.province_id, province_b.province_id):
+						continue
+					if province_a.center.distance_to(province_b.center) > max_center_distance:
+						continue
+					if _polygons_touch(province_a, province_b, touch_distance):
+						_add_neighbor(province_a.province_id, province_b.province_id)
 
 
 func _polygons_touch(province_a: Province, province_b: Province, max_distance: float) -> bool:

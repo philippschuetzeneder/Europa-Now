@@ -85,6 +85,12 @@ func fit_to_bounds(bounds: Rect2, viewport_size: Vector2, padding := 80.0) -> vo
 	if bounds.size == Vector2.ZERO:
 		return
 
+	_configure_fit_zoom(bounds, viewport_size, padding)
+	position = bounds.get_center()
+	_set_zoom(get_start_zoom())
+
+
+func fit_world_with_focus(focus_world: Vector2, viewport_size: Vector2, padding := 80.0) -> void:
 	if viewport_size.x <= 1.0 or viewport_size.y <= 1.0:
 		var viewport := get_viewport()
 		if viewport != null:
@@ -92,18 +98,29 @@ func fit_to_bounds(bounds: Rect2, viewport_size: Vector2, padding := 80.0) -> vo
 	if viewport_size.x <= 1.0 or viewport_size.y <= 1.0:
 		return
 
-	position = bounds.get_center()
+	_configure_fit_zoom(GeoProjection.world_view_bounds(), viewport_size, padding)
+	position = focus_world
+	_set_zoom(get_start_zoom())
+
+
+func _configure_fit_zoom(bounds: Rect2, viewport_size: Vector2, padding: float) -> void:
+	if bounds.size == Vector2.ZERO:
+		return
+
+	if viewport_size.x <= 1.0 or viewport_size.y <= 1.0:
+		var viewport := get_viewport()
+		if viewport != null:
+			viewport_size = viewport.get_visible_rect().size
+	if viewport_size.x <= 1.0 or viewport_size.y <= 1.0:
+		return
 
 	var usable := viewport_size - Vector2(padding, padding) * 2.0
 	usable.x = maxf(usable.x, 1.0)
 	usable.y = maxf(usable.y, 1.0)
 	var zoom_x := usable.x / bounds.size.x
 	var zoom_y := usable.y / bounds.size.y
-	var fit_zoom := minf(zoom_x, zoom_y)
-	_fit_zoom = fit_zoom
-	_min_zoom_limit = fit_zoom * pow(1.0 - ZOOM_STEP, float(EXTRA_ZOOM_OUT_STEPS))
-	var start_zoom: float = get_start_zoom()
-	_set_zoom(start_zoom)
+	_fit_zoom = minf(zoom_x, zoom_y)
+	_min_zoom_limit = _fit_zoom * pow(1.0 - ZOOM_STEP, float(EXTRA_ZOOM_OUT_STEPS))
 
 
 func _apply_keyboard_pan(delta: float) -> void:

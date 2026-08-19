@@ -20,6 +20,7 @@ var neighbor_country_ids: Array[String] = []
 
 var _base_color: Color
 var _rings: Array = []
+var _border_segments_cache: Array = []
 var _is_selected := false
 var _is_hovered := false
 
@@ -85,13 +86,16 @@ func get_placement_position() -> Vector2:
 
 
 func get_border_segments() -> Array:
+	if not _border_segments_cache.is_empty():
+		return _border_segments_cache
 	var segments: Array = []
 	for ring in _rings:
 		if ring is not PackedVector2Array:
 			continue
 		for i in ring.size():
 			segments.append([ring[i], ring[(i + 1) % ring.size()]])
-	return segments
+	_border_segments_cache = segments
+	return _border_segments_cache
 
 
 func _largest_ring() -> PackedVector2Array:

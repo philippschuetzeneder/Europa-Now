@@ -7,6 +7,7 @@ signal combat_ended(combat: CombatState)
 signal province_captured(province_id: String, new_controller_id: String)
 
 var war_state: WarState
+var _country_colors: Dictionary = {}
 
 var _unit_manager: UnitManager
 var _provinces_by_id: Dictionary = {}
@@ -20,11 +21,13 @@ func initialize(
 	unit_manager: UnitManager,
 	provinces: Array[Province],
 	adjacency: ProvinceAdjacency,
-	war: WarState
+	war: WarState,
+	country_colors: Dictionary = {}
 ) -> void:
 	_unit_manager = unit_manager
 	_adjacency = adjacency
 	war_state = war
+	_country_colors = country_colors
 	_provinces_by_id.clear()
 	for province in provinces:
 		_provinces_by_id[province.province_id] = province
@@ -68,11 +71,23 @@ func on_day_advanced(_date: GameDate) -> void:
 		_process_combat_day(combat)
 
 
+func on_peace_signed(country_a: String, country_b: String) -> void:
+	var combats_to_end: Array[CombatState] = []
+	for combat: CombatState in _combats_by_id.values():
+		if not combat.is_active():
+			continue
+		if _combat_contains_country_pair(combat, country_a, country_b):
+			combats_to_end.append(combat)
+
+	for combat in combats_to_end:
+		_end_combat_without_battle_winner(combat)
+
+
 func handle_province_after_arrivals(province_id: String) -> void:
 	if _combats_by_province.has(province_id):
 		return
 
-	var hostile_groups := _collect_hostile_groups_in_province(province_id)
+	var hostile_groups: Array = _collect_hostile_groups_in_province(province_id)
 	if hostile_groups.size() < 2:
 		return
 
@@ -86,7 +101,6 @@ func get_save_data() -> Dictionary:
 	return {
 		"combats": combats,
 		"combat_counter": _combat_counter,
-		"war_state": war_state.to_dict() if war_state != null else {},
 	}
 
 
@@ -94,10 +108,8 @@ func load_save_data(data: Dictionary) -> void:
 	_combats_by_id.clear()
 	_combats_by_province.clear()
 	_combat_counter = int(data.get("combat_counter", 0))
-	if war_state != null:
-		war_state.load_from_dict(data.get("war_state", {}))
 	for entry in data.get("combats", []):
-		var combat := CombatState.from_dict(entry)
+		var combat: CombatState = CombatState.from_dict(entry)
 		_register_combat(combat)
 		_sync_province_contested(combat.province_id)
 
@@ -109,7 +121,7 @@ func _try_join_or_start_combat(arriving_unit: Unit, was_moving: bool) -> bool:
 		_add_unit_to_combat(existing, arriving_unit)
 		return true
 
-	var enemies := _find_hostile_units_in_province(arriving_unit)
+	var enemies: Array[Unit] = _find_hostile_units_in_province(arriving_unit)
 	if enemies.is_empty():
 		return false
 
@@ -156,7 +168,7 @@ func _start_combat(province_id: String, attackers: Array[Unit], defenders: Array
 		return
 
 	_combat_counter += 1
-	var combat := CombatState.new()
+	var combat: CombatState = CombatState.new()
 	combat.combat_id = "combat_%d" % _combat_counter
 	combat.province_id = province_id
 	combat.start_date = GameTime.current_date.duplicate_date()
@@ -172,14 +184,14 @@ func _start_combat(province_id: String, attackers: Array[Unit], defenders: Array
 
 
 func _add_unit_to_combat(combat: CombatState, unit: Unit) -> void:
-	var is_attacker := _unit_belongs_to_side(unit, combat.attacker_country_ids)
-	var is_defender := _unit_belongs_to_side(unit, combat.defender_country_ids)
+	var is_attacker: bool = _unit_belongs_to_side(unit, combat.attacker_country_ids)
+	var is_defender: bool = _unit_belongs_to_side(unit, combat.defender_country_ids)
 	if is_attacker:
 		_add_unit_id_to_side(combat, unit, true)
 	elif is_defender:
 		_add_unit_id_to_side(combat, unit, false)
 	else:
-		var arriving_was_attacker := not _side_has_stationary_units(combat.defender_unit_ids, unit.unit_id)
+		var arriving_was_attacker: bool = not _side_has_stationary_units(combat.defender_unit_ids, unit.data.unit_id)
 		_add_unit_id_to_side(combat, unit, arriving_was_attacker)
 	combat_updated.emit(combat)
 
@@ -206,13 +218,13 @@ func _add_unit_id_to_side(combat: CombatState, unit: Unit, is_attacker: bool) ->
 
 
 func _process_combat_day(combat: CombatState) -> void:
-	var attacker_units := _get_units_by_ids(combat.attacker_unit_ids)
-	var defender_units := _get_units_by_ids(combat.defender_unit_ids)
+	var attacker_units: Array[Unit] = _get_units_by_ids(combat.attacker_unit_ids)
+	var defender_units: Array[Unit] = _get_units_by_ids(combat.defender_unit_ids)
 
 	for unit in attacker_units + defender_units:
 		CombatCalculator.apply_daily_wear(unit.data)
 
-	var losses := CombatCalculator.calculate_daily_casualties(attacker_units, defender_units)
+	var losses: Dictionary = CombatCalculator.calculate_daily_casualties(attacker_units, defender_units)
 	combat.attacker_casualties += CombatCalculator.apply_casualties_to_side(attacker_units, losses["attacker"])
 	combat.defender_casualties += CombatCalculator.apply_casualties_to_side(defender_units, losses["defender"])
 	combat.days_fought += 1
@@ -222,7 +234,7 @@ func _process_combat_day(combat: CombatState) -> void:
 	if not CombatCalculator.should_end_combat(attacker_units, defender_units, combat.days_fought):
 		return
 
-	var winner_side := CombatCalculator.determine_winner_side(attacker_units, defender_units)
+	var winner_side: String = CombatCalculator.determine_winner_side(attacker_units, defender_units)
 	_resolve_combat(combat, winner_side)
 
 
@@ -230,8 +242,8 @@ func _resolve_combat(combat: CombatState, winner_side: String) -> void:
 	combat.status = CombatState.Status.ENDED
 	combat.winner_side = winner_side
 
-	var attacker_units := _get_units_by_ids(combat.attacker_unit_ids)
-	var defender_units := _get_units_by_ids(combat.defender_unit_ids)
+	var attacker_units: Array[Unit] = _get_units_by_ids(combat.attacker_unit_ids)
+	var defender_units: Array[Unit] = _get_units_by_ids(combat.defender_unit_ids)
 	var winner_units: Array[Unit] = attacker_units if winner_side == "attacker" else defender_units
 	var loser_units: Array[Unit] = defender_units if winner_side == "attacker" else attacker_units
 
@@ -242,7 +254,7 @@ func _resolve_combat(combat: CombatState, winner_side: String) -> void:
 
 	var province: Province = _provinces_by_id.get(combat.province_id)
 	if winner_side == "attacker" and province != null:
-		var new_owner := combat.attacker_country_ids[0]
+		var new_owner: String = combat.attacker_country_ids[0]
 		_capture_province(province, new_owner)
 
 	for unit in loser_units:
@@ -253,9 +265,41 @@ func _resolve_combat(combat: CombatState, winner_side: String) -> void:
 	combat_ended.emit(combat)
 
 
+func _end_combat_without_battle_winner(combat: CombatState) -> void:
+	combat.status = CombatState.Status.ENDED
+	combat.winner_side = "peace"
+	var units := _get_units_by_ids(combat.attacker_unit_ids)
+	units.append_array(_get_units_by_ids(combat.defender_unit_ids))
+	for unit in units:
+		unit.data.is_in_combat = false
+		unit.data.combat_id = ""
+		unit.set_in_combat(false)
+	_set_province_contested(combat.province_id, false)
+	_combats_by_province.erase(combat.province_id)
+	combat_ended.emit(combat)
+
+
+func _combat_contains_country_pair(
+	combat: CombatState,
+	country_a: String,
+	country_b: String
+) -> bool:
+	for attacker_country in combat.attacker_country_ids:
+		for defender_country in combat.defender_country_ids:
+			if (
+				(attacker_country == country_a and defender_country == country_b)
+				or (attacker_country == country_b and defender_country == country_a)
+			):
+				return true
+	return false
+
+
 func _capture_province(province: Province, country_id: String) -> void:
 	province.set_controller(country_id)
-	province.set_owner(country_id)
+	province.set_controller_color(
+		_country_colors.get(country_id, Color.TRANSPARENT)
+	)
+	province.set_owner_country(country_id)
 	province_captured.emit(province.province_id, country_id)
 
 
@@ -264,7 +308,7 @@ func _order_retreat_or_destroy(unit: Unit) -> void:
 		_unit_manager.destroy_unit(unit)
 		return
 
-	var retreat_target := CombatRetreat.find_retreat_province(
+	var retreat_target: String = CombatRetreat.find_retreat_province(
 		unit.data,
 		unit.data.current_province_id,
 		_adjacency,
@@ -294,7 +338,7 @@ func _has_hostile_units_in_province(unit: Unit) -> bool:
 
 
 func _collect_hostile_groups_in_province(province_id: String) -> Array:
-	var units := _unit_manager.get_units_in_province(province_id)
+	var units: Array[Unit] = _unit_manager.get_units_in_province(province_id)
 	var groups: Dictionary = {}
 	for unit in units:
 		if unit.data.is_retreating:
@@ -320,7 +364,7 @@ func _collect_hostile_groups_in_province(province_id: String) -> Array:
 func _get_units_by_ids(unit_ids: Array[String]) -> Array[Unit]:
 	var result: Array[Unit] = []
 	for unit_id in unit_ids:
-		var unit := _unit_manager.get_unit(unit_id)
+		var unit: Unit = _unit_manager.get_unit(unit_id)
 		if unit != null:
 			result.append(unit)
 	return result
@@ -350,7 +394,7 @@ func _side_has_stationary_units(unit_ids: Array[String], exclude_unit_id: String
 	for unit_id in unit_ids:
 		if unit_id == exclude_unit_id:
 			continue
-		var unit := _unit_manager.get_unit(unit_id)
+		var unit: Unit = _unit_manager.get_unit(unit_id)
 		if unit != null and not unit.data.is_moving:
 			return true
 	return false

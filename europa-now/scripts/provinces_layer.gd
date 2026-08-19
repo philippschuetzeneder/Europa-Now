@@ -59,6 +59,22 @@ func find_province_near_position(country_id: String, position: Vector2) -> Provi
 	return best
 
 
+func find_border_province_pair(
+	country_a: String,
+	country_b: String,
+	adjacency: ProvinceAdjacency
+) -> Dictionary:
+	for province in get_provinces_for_country(country_a):
+		for neighbor_id in adjacency.get_neighbors(province.province_id):
+			var neighbor: Province = get_province(neighbor_id)
+			if neighbor != null and neighbor.country_id == country_b:
+				return {
+					"home_province_id": province.province_id,
+					"foreign_province_id": neighbor_id,
+				}
+	return {}
+
+
 func _add_province(data: Dictionary) -> void:
 	var province := Province.new()
 	province.setup(data)

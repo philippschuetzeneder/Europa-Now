@@ -1,6 +1,7 @@
 extends Node
 
 signal day_advanced(date: GameDate)
+signal month_advanced(date: GameDate)
 signal speed_changed(speed: int)
 
 enum Speed { PAUSE, X1, X2, X5 }
@@ -56,6 +57,8 @@ func get_speed_label() -> String:
 func _advance_day() -> void:
 	current_date = current_date.add_days(1)
 	day_advanced.emit(current_date)
+	if current_date.day == 1:
+		month_advanced.emit(current_date)
 
 
 func _get_speed_multiplier() -> float:

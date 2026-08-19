@@ -5,6 +5,8 @@ signal country_selected(country: Country)
 signal province_selected(province: Province)
 signal province_move_ordered(province: Province)
 signal unit_selected(unit: Unit)
+signal unit_deselected
+signal diplomacy_country_requested(country_id: String)
 signal map_loaded(bounds: Rect2)
 
 @onready var countries_root: Node2D = $Countries
@@ -26,6 +28,8 @@ var _hovered_province: Province
 var _last_mouse_pos := Vector2.INF
 var _map_camera: MapCamera
 var _combat_manager: CombatManager
+var _economy_manager: EconomyManager
+var _diplomacy_manager: DiplomacyManager
 var _war_state: WarState
 
 
@@ -57,6 +61,11 @@ func _handle_left_click() -> void:
 	var world_pos := _get_mouse_world_position()
 	var unit: Unit = units_root.pick_unit_at(world_pos)
 	if unit != null:
+		if units_root.get_selected_unit() == unit:
+			units_root.clear_unit_selection()
+			unit_deselected.emit()
+			get_viewport().set_input_as_handled()
+			return
 		units_root.select_unit(unit)
 		_clear_selection()
 		unit_selected.emit(unit)
@@ -65,18 +74,25 @@ func _handle_left_click() -> void:
 
 	var province: Province = _pick_province_at(world_pos)
 	if province != null:
+		if units_root.get_selected_unit() != null:
+			units_root.clear_unit_selection()
+			unit_deselected.emit()
 		_select_province(province)
 		province_selected.emit(province)
 		get_viewport().set_input_as_handled()
 
 
 func _handle_right_click() -> void:
-	if units_root.get_selected_unit() == null:
-		return
-
 	var world_pos := _get_mouse_world_position()
 	var province: Province = _pick_province_at(world_pos)
 	if province == null:
+		return
+
+	if units_root.get_selected_unit() == null and province.country_id != "DEU":
+		diplomacy_country_requested.emit(province.country_id)
+		get_viewport().set_input_as_handled()
+		return
+	if units_root.get_selected_unit() == null:
 		return
 
 	_select_province(province)
@@ -116,8 +132,16 @@ func get_war_state() -> WarState:
 	return _war_state
 
 
+func get_diplomacy_manager() -> DiplomacyManager:
+	return _diplomacy_manager
+
+
+func get_economy_manager() -> EconomyManager:
+	return _economy_manager
+
+
 func order_selected_unit_move(province_id: String) -> bool:
-	var unit := units_root.get_selected_unit()
+	var unit: Unit = units_root.get_selected_unit()
 	if unit == null:
 		return false
 	return units_root.order_move_to_province(unit, province_id)
@@ -169,6 +193,15 @@ func _build_map() -> void:
 						bounds = bounds.expand(point)
 
 	_provinces = provinces_root.build_from_countries(country_data)
+	var country_colors: Dictionary = {}
+	for data in country_data:
+		country_colors[str(data["id"])] = data["color"]
+	for province in _provinces:
+		var controller_color: Color = country_colors.get(
+			province.controller_country_id,
+			Color.TRANSPARENT
+		)
+		province.set_controller_color(controller_color)
 	_province_adjacency = ProvinceAdjacency.build(_provinces)
 	_country_adjacency = CountryAdjacency.build(_countries)
 	for country in _countries:
@@ -176,24 +209,77 @@ func _build_map() -> void:
 	_validation_report = MapValidator.validate(_countries, _provinces, _province_adjacency)
 	capitals_root.build_from_countries(_countries)
 
-	var start_province_id := "DEU_bb"
-	if provinces_root.get_province(start_province_id) == null:
-		var berlin_position := GeoProjection.project(13.405, 52.52)
-		var start_province: Province = provinces_root.find_province_near_position("DEU", berlin_position)
-		if start_province != null:
-			start_province_id = start_province.province_id
+	var start_province_id: String = ""
+	var enemy_province_id: String = ""
+	var border_pair: Dictionary = provinces_root.find_border_province_pair("DEU", "AUT", _province_adjacency)
+	if not border_pair.is_empty():
+		start_province_id = str(border_pair["home_province_id"])
+		enemy_province_id = str(border_pair["foreign_province_id"])
+	else:
+		border_pair = provinces_root.find_border_province_pair("DEU", "CZE", _province_adjacency)
+		if not border_pair.is_empty():
+			start_province_id = str(border_pair["home_province_id"])
+			enemy_province_id = str(border_pair["foreign_province_id"])
 
-	units_root.initialize(_provinces, _province_adjacency, start_province_id)
+	if start_province_id.is_empty():
+		var munich_position := GeoProjection.bavaria_focus_position()
+		var bavaria_province: Province = provinces_root.find_province_near_position("DEU", munich_position)
+		if bavaria_province != null:
+			start_province_id = bavaria_province.province_id
+		else:
+			start_province_id = "DEU_bb"
+			if provinces_root.get_province(start_province_id) == null:
+				var berlin_position := GeoProjection.project(13.405, 52.52)
+				var start_province: Province = provinces_root.find_province_near_position("DEU", berlin_position)
+				if start_province != null:
+					start_province_id = start_province.province_id
 
-	_war_state = WarState.new()
-	_war_state.set_war("DEU", "AUT", true)
-	_war_state.set_war("DEU", "CZE", true)
+	var country_ids: Array[String] = []
+	for country in _countries:
+		country_ids.append(country.country_id)
+	_diplomacy_manager = DiplomacyManager.new()
+	_diplomacy_manager.name = "Diplomacy"
+	add_child(_diplomacy_manager)
+	var initial_wars: Array[Array] = [
+		["DEU", "AUT"],
+		["DEU", "CZE"],
+	]
+	_diplomacy_manager.initialize(
+		country_ids,
+		initial_wars
+	)
+	_war_state = _diplomacy_manager.get_war_state()
+
+	if enemy_province_id.is_empty():
+		for enemy_country in ["AUT", "CZE", "POL", "FRA", "NLD", "DNK"]:
+			if not _war_state.are_at_war("DEU", enemy_country):
+				continue
+			border_pair = provinces_root.find_border_province_pair("DEU", enemy_country, _province_adjacency)
+			if not border_pair.is_empty():
+				if start_province_id.is_empty():
+					start_province_id = str(border_pair["home_province_id"])
+				enemy_province_id = str(border_pair["foreign_province_id"])
+				break
+
+	units_root.initialize(_provinces, _province_adjacency, start_province_id, enemy_province_id, _war_state)
 
 	_combat_manager = CombatManager.new()
 	_combat_manager.name = "Combat"
 	add_child(_combat_manager)
-	_combat_manager.initialize(units_root, _provinces, _province_adjacency, _war_state)
+	_combat_manager.initialize(
+		units_root,
+		_provinces,
+		_province_adjacency,
+		_war_state,
+		country_colors
+	)
 	units_root.combat_manager = _combat_manager
+	_diplomacy_manager.peace_signed.connect(_combat_manager.on_peace_signed)
+
+	_economy_manager = EconomyManager.new()
+	_economy_manager.name = "Economy"
+	add_child(_economy_manager)
+	_economy_manager.initialize(_countries, _provinces, units_root)
 
 	_create_horizon_wrap_visuals()
 	call_deferred("_emit_map_loaded", bounds)
@@ -220,7 +306,7 @@ func _get_mouse_world_position() -> Vector2:
 
 
 func _pick_province_at(world_pos: Vector2) -> Province:
-	var space := get_world_2d().direct_space_state
+	var space: PhysicsDirectSpaceState2D = get_world_2d().direct_space_state
 	var params := PhysicsPointQueryParameters2D.new()
 	params.collide_with_areas = true
 	params.collide_with_bodies = false
@@ -229,7 +315,7 @@ func _pick_province_at(world_pos: Vector2) -> Province:
 	for x_offset in GeoProjection.wrap_offsets():
 		params.position = world_pos + Vector2(x_offset, 0.0)
 		for hit in space.intersect_point(params, 32):
-			var collider = hit.get("collider")
+			var collider: Variant = hit.get("collider")
 			if collider is Province:
 				return collider
 	return null
